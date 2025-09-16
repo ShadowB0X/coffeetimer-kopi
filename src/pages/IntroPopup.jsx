@@ -25,7 +25,7 @@ export default function IntroPopup({ onFinish }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* 🌊 Animated SVG Wave */}
+          
           <div className={styles.waveContainer}>
             <svg
               className={styles.waveSvg}
@@ -42,7 +42,7 @@ export default function IntroPopup({ onFinish }) {
             </svg>
           </div>
 
-          {/* ✨ Welcome Text */}
+         
           <motion.h1
             className={styles.text}
             initial={{ opacity: 0, y: 30 }}

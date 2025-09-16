@@ -10,7 +10,7 @@ import FileListPage from './pages/FileListPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './pages/Navbar';
-import IntroPage from './pages/IntroPage'; // ✅ New intro landing page
+import IntroPage from './pages/IntroPage'; 
 
 function App() {
   const [token, setToken] = useState(null);
@@ -46,7 +46,7 @@ function App() {
       <Navbar username={username} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/intro" element={<IntroPage />} /> {/* ✅ NEW route */}
+        <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/vision" element={<VisionPage />} />
         <Route path="/endpoints" element={<EndpointPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />

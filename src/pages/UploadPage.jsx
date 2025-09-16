@@ -33,13 +33,13 @@ export default function UploadPage({ token }) {
       });
 
       if (res.ok) {
-        setMessage("✅ Upload successful!");
+        setMessage(" Upload successful!");
         setIsComplete(true);
       } else {
-        setMessage("❌ Upload failed.");
+        setMessage(" Upload failed.");
       }
     } catch (err) {
-      setMessage(`❌ Error: ${err.message}`);
+      setMessage(` Error: ${err.message}`);
     } finally {
       setIsUploading(false);
     }

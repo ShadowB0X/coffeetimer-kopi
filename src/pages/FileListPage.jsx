@@ -1,4 +1,4 @@
-// FileList.jsx
+
 import { useEffect, useState } from 'react';
 import styles from '../components/FileList.module.css';
 import BPMChart from './BPMChart';
@@ -18,7 +18,7 @@ export default function FileList({ token }) {
       const data = await res.json();
       setFiles(data.files || []);
     } catch (err) {
-      console.error('❌ Fetch error:', err);
+      console.error(' Fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -39,10 +39,10 @@ export default function FileList({ token }) {
       if (res.ok) {
         setFiles(prev => prev.filter(file => file.id !== id));
       } else {
-        alert('❌ Delete failed');
+        alert(' Delete failed');
       }
     } catch (err) {
-      console.error('❌ Delete error:', err);
+      console.error(' Delete error:', err);
     }
   };
 

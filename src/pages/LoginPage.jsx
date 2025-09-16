@@ -24,8 +24,7 @@ export default function LoginPage({ onLogin }) {
         const data = await res.json();
         const userEmail = data.user?.email || email;
         onLogin(data.token, userEmail);
-        setRedirectTo(redirectPath); // ✅ go back to original page
-      } else {
+        setRedirectTo(redirectPath); // 
         alert('Login failed');
       }
     } catch (err) {
