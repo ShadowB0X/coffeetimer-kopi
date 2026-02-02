@@ -18,9 +18,9 @@ export default function MainPage() {
           {/* Main content with spacing under sticky navbar */}
           <main className={styles.contentWrapper}>
             <div className={styles.content}>
-              <h1 className={styles.title}>Welcome to SoundAPII</h1>
+              <h1 className={styles.title}>Welcome to ShortCut</h1>
               <p className={styles.text}>
-                Unlock the power of intelligent audio analysis — extract meaning from sound, frequency, and rhythm using SoundAPI.
+                Sharpen Your Style — ShortCut
               </p>
               <p className={styles.text}>
                 SoundAPI is designed to help developers, artists, and AI systems understand audio at a deeper level.
