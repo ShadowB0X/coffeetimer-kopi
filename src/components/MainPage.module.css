@@ -24,7 +24,7 @@
 
   box-shadow: 0 0 80px rgba(0, 255, 255, 0.03) inset;
 
-  color: rgb(0, 0, 0);
+  color: rgb(254, 247, 247);
   text-align: center;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .text {
-  color: #ccc;
+  color: #000000;
   margin: 1rem 0;
   line-height: 1.6;
 }
