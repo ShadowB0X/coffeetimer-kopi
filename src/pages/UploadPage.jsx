@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import styles from '../components/UploadPage.module.css';
-import WaveBackground from './WaveBackground';
 
 export default function UploadPage({ token }) {
   const [file, setFile] = useState(null);
