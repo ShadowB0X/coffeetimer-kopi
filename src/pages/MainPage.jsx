@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import styles from '../components/MainPage.module.css';
-import WaveBackground from './WaveBackground';
 import ImageBox from './imageBox';
 import IntroPopup from './IntroPopup';
 
