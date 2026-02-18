@@ -13,17 +13,20 @@
     border-radius: 12px;
     box-shadow: 0 0 20px #00f2ff;
   }
-  .imageWrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 2rem 0;
-  }
-  
-  .image {
-    width: 300px;
-    height: 300px;
-    object-fit: contain;
-    border-radius: 16px;
-    box-shadow: 0 0 20px #00f2ff;
-  }
+  /* fyld hele viewporten */
+.imageWrapper {
+  position: fixed;      /* eller "relative" hvis det skal være i layoutet */
+  inset: 0;             /* top/right/bottom/left = 0 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1; /* bag alt */
+}
+
+/* få billedet til at fylde pænt */
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* cover = fylder, kan croppe lidt */
+  display: block;
+}
