@@ -50,7 +50,7 @@ export default function IntroPopup({ onFinish }) {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 1 }}
           >
-            Welcome to <span className={styles.highlight}>SoundAPI</span>
+            Welcome to <span className={styles.highlight}>ShortCut</span>
           </motion.h1>
         </motion.div>
       )}
