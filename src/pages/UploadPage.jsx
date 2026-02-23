@@ -46,7 +46,7 @@ export default function UploadPage({ token }) {
 
   return (
     <div className={styles.container}>
-      <WaveBackground />
+    
 
       <form onSubmit={handleUpload} className={styles.uploadBox}>
         <h2>Upload Audio</h2>

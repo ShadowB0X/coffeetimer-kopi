@@ -32,7 +32,7 @@ export default function MainPage() {
             </div>
           </main>
 
-          <WaveBackground />
+          
         </>
       )}
     </div>

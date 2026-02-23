@@ -14,7 +14,7 @@ export default function IntroPage() {
         </nav>
 
         <div className={styles.introHero}>
-          <h1>Welcome to <span>SoundAPI</span></h1>
+          <h1>Welcome to <span>ShortCut</span></h1>
           <p>Analyze audio with elegance, precision, and rhythm.</p>
         </div>
       </div>
