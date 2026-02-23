@@ -22,10 +22,10 @@ export default function MainPage() {
                 Sharpen Your Style — ShortCut
               </p>
               <p className={styles.text}>
-                SoundAPI is designed to help developers, artists, and AI systems understand audio at a deeper level.
+                ShortCut is designed to help the people, artists, and business men get their style at a deeper level.
               </p>
               <p className={styles.text}>
-                Learn about the visions, or click the button to explore our API endpoints.
+                Learn about our visions, and what we do.
               </p>
 
               <ImageBox /> 
