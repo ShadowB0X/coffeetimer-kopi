@@ -12,7 +12,7 @@ export default function Navbar({ username, onLogout }) {
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContainer}>
-        <Link to="/" className={styles.logo}>SoundAPI</Link>
+        <Link to="/" className={styles.logo}>ShortCut</Link>
 
         <div className={styles.navLinks}>
           <Link to="/vision" className={styles.link}>Go to Vision</Link>
