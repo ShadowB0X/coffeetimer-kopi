@@ -1,80 +1,72 @@
-.navbar {
-  width: 100%;
-  background-color: #000;
-  padding: 1rem 2rem;
+.navbar{
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 12px rgba(0, 255, 255, 0.2);
+  width: 100%;
+  background: rgba(245,245,243,0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-.navContainer {
-  max-width: 1200px;
+.navContainer{
+  max-width: 1100px;
   margin: 0 auto;
+  height: 74px;
+  padding: 0 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  gap: 18px;
 }
 
-.logo {
-  color: #00d4ff;
-  font-size: 1.6rem;
-  font-weight: bold;
+.logo{
+  font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #111;
   text-decoration: none;
+  letter-spacing: 0.01em;
 }
 
-.navLinks {
+.navLinks{
   display: flex;
-  gap: 1rem;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 22px;
 }
 
-.link {
-  color: #fff;
-  background-color: #00c8ff;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+.link{
+  font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+  font-size: 1.05rem;
+  color: rgba(0,0,0,0.78);
   text-decoration: none;
-  font-weight: 500;
-  box-shadow: 0 0 8px #00f2ff;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  padding: 8px 6px;
+  border-radius: 10px;
 }
 
-.link:hover {
-  background-color: #009fcf;
-  box-shadow: 0 0 12px #00f2ff;
+.link:hover{
+  color: rgba(0,0,0,0.95);
+  background: rgba(0,0,0,0.03);
 }
 
-.welcome {
-  margin-left: 1rem;
-  color: #00f2ff;
-  font-weight: bold;
-  font-size: 0.95rem;
+.bookBtn{
+  font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+  font-size: 1.02rem;
+  color: #111;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.35);
+  background: rgba(255,255,255,0.35);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
-.logoutButton {
-  background: none;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  font-size: 0.9rem;
-  padding: 0.3rem 0.6rem;
-  margin-left: 0.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  width: auto;
-  max-width: 150px;
-  box-shadow: none !important;       /* ✅ remove all glow */
-  transition: background 0.2s ease, color 0.2s ease;
+.bookBtn:hover{
+  background: rgba(255,255,255,0.6);
 }
 
-.logoutButton:hover {
-  background: #ff4d4d;
-  color: #000;
+@media (max-width: 640px){
+  .navLinks{ gap: 10px; }
+  .link{ font-size: 0.98rem; }
+  .bookBtn{ padding: 9px 14px; }
 }

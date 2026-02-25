@@ -43,9 +43,12 @@ function App() {
 
   return (
     <>
-      <Navbar username={username} onLogout={handleLogout} />
+      <Navbar />
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/prices" element={<PricesPage />} />
+        <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/vision" element={<VisionPage />} />
         <Route path="/endpoints" element={<EndpointPage />} />
