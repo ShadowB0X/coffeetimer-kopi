@@ -1,126 +1,90 @@
+/* --- Mobile improvements --- */
+
+/* iOS notch safe-area (optional but nice) */
 .page{
-  background: #f5f5f3;
-  min-height: 100vh;
-  color: #111;
-  font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
+/* Hero: undgå tvungen 520px på små mobiler */
 .hero{
-  position: relative;
-  width: 100%;
-  min-height: 520px;
-  background-size: cover;
-  background-position: center;
-  display: grid;
-  place-items: end center;
-  padding: 0 18px 34px;
+  min-height: clamp(420px, 72vh, 620px);
+  padding: 0 16px 26px;
 }
 
-.heroOverlay{
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(1200px 450px at 50% 90%, rgba(245,245,243,0.88), rgba(245,245,243,0.58) 40%, rgba(245,245,243,0.0) 75%),
-    linear-gradient(to bottom, rgba(245,245,243,0.15), rgba(245,245,243,0.60) 55%, rgba(245,245,243,0.88));
-  pointer-events: none;
-}
-
+/* Text: lidt mere plads og mindre risiko for overflow */
 .heroInner{
-  position: relative;
-  text-align: center;
-  max-width: 900px;
-  width: 100%;
+  padding: 0 6px;
 }
 
-.heroTitle{
-  font-size: clamp(2.3rem, 4.2vw, 3.2rem);
-  font-weight: 700;
-  margin: 0 0 10px;
-  letter-spacing: 0.01em;
-  color: #150101ba;
-  text-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-
-.heroSub{
-  margin: 0;
-  font-size: 1.08rem;
-  letter-spacing: 0.03em;
-  color: #2b2b2b;
-  text-shadow: 0 8px 20px rgba(0,0,0,0.28);
-}
-
+/* Cards wrapper: mere luft på mobil */
 .cardsWrap{
-  padding: 26px 18px 70px;
-  margin-top: -12px;
+  padding: 18px 16px 60px;
+  margin-top: -10px;
 }
 
+/* Default: 3 kolonner på desktop (som du har) */
 .cards{
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  gap: 18px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.card{
-  background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(0,0,0,0.10);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.10);
-}
-
-.cardImage{
-  height: 210px;
-  background-size: cover;
-  background-position: center;
-  filter: saturate(0.92) contrast(1.02);
-}
-
-.cardBody{
-  padding: 16px 16px 18px;
-  text-align: center;
-}
-
-.iconRow{
-  display: flex;
-  justify-content: center;
-  margin: 4px 0 10px;
-  opacity: 0.55;
-}
-
-.iconHat, .iconBeard, .iconCare{
-  width: 28px;
-  height: 20px;
-  display: inline-block;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-/* Simple inline SVG icons */
-.iconHat{
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M9 26c5-7 14-11 23-11s18 4 23 11h-7c-4-4-10-7-16-7s-12 3-16 7H9z'/%3E%3Cpath fill='%23111' d='M4 28h56v4H4z'/%3E%3C/svg%3E");
-}
-.iconBeard{
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M32 6c8 0 14 6 14 14 0 10-8 18-14 18S18 30 18 20C18 12 24 6 32 6zm0 6c-4 0-8 3-8 8 0 7 5 12 8 12s8-5 8-12c0-5-4-8-8-8z'/%3E%3C/svg%3E");
-}
-.iconCare{
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M14 30h10V12H14v18zm3-15h4v12h-4V15zM28 30h10V10H28v20zm3-17h4v14h-4V13zM42 30h8V16h-8v14zm3-11h2v8h-2v-8z'/%3E%3C/svg%3E");
-}
-
-.cardTitle{
-  font-size: 1.35rem;
-  margin: 0 0 6px;
-}
-
-.cardText{
-  margin: 0;
-  font-size: 0.98rem;
-  opacity: 0.78;
-}
-
+/* Tablet: 2 kolonner */
 @media (max-width: 900px){
-  .cards{ grid-template-columns: 1fr; }
-  .hero{ min-height: 520px; }
+  .cards{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cardImage{
+    height: 190px;
+  }
+}
+
+/* Mobil: 1 kolonne + bedre spacing */
+@media (max-width: 620px){
+  .hero{
+    min-height: clamp(380px, 68vh, 560px);
+    padding: 0 14px 22px;
+  }
+
+  /* Beholder dine farver — kun størrelse/spacing */
+  .heroTitle{
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+    margin-bottom: 8px;
+  }
+
+  .heroSub{
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .cards{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card{
+    border-radius: 16px;
+  }
+
+  .cardImage{
+    height: 180px;
+  }
+
+  .cardBody{
+    padding: 14px 14px 16px;
+  }
+
+  .cardTitle{
+    font-size: 1.22rem;
+  }
+
+  .cardText{
+    font-size: 0.95rem;
+  }
+}
+
+/* Tiny phones (iPhone SE etc.) */
+@media (max-width: 380px){
+  .heroTitle{
+    font-size: 1.75rem;
+  }
 }
