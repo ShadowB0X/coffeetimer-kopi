@@ -44,7 +44,7 @@ export default function VisionPage() {
             <div className={styles.meta}>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>Telefon</span>
-                <a className={styles.metaValueLink} href="tel:+4500000000">+45 00 00 00 00</a>
+                <a className={styles.metaValueLink} href="tel:+4500000000">+45 33230444</a>
               </div>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>Email</span>
