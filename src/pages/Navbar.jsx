@@ -9,8 +9,8 @@ export default function Navbar() {
 
         <div className={styles.navLinks}>
           <Link to="/services" className={styles.link}>Services</Link>
-          <Link to="/prices" className={styles.link}>Prices</Link>
-          <Link to="/vision" className={styles.link}>Vision</Link>
+          <Link to="/prices" className={styles.link}>Priser</Link>
+          <Link to="/vision" className={styles.link}>Kontakt</Link>
           <Link to="/booking" className={styles.bookBtn}>Book Tid</Link>
         </div>
       </div>
