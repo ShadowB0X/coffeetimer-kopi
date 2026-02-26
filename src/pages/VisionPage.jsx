@@ -33,7 +33,7 @@ export default function VisionPage() {
               </div>
             </div>
 
-            <a className={styles.linkBtn} href="https://maps.google.com/?q=Gammel%20Kongevej%2091C%201850%20Frederiksberg" target="_blank" rel="noreferrer">
+            <a className={styles.linkBtn} href="https://maps.app.goo.gl/j75GXaf7rheMReYJA" target="_blank" rel="noreferrer">
               Åbn i Maps
             </a>
           </article>
