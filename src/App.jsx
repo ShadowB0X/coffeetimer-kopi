@@ -1,18 +1,18 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-import ServicesPage from './pages/ServicesPage';
-import PricesPage from './pages/PricesPage';
-import BookingPage from './pages/BookingPage';
-import MainPage from './pages/MainPage';
-import VisionPage from './pages/VisionPage';
-import EndpointPage from './pages/EndPointPage';
-import LoginPage from './pages/LoginPage';
-import UploadPage from './pages/UploadPage';
-import FileListPage from './pages/FileListPage';
-import RegisterPage from './pages/RegisterPage';
-import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './pages/NavBar';
+import ServicesPage from './pages/ServicesPage.jsx';
+import PricesPage from './pages/PricesPage.jsx';
+import BookingPage from './pages/BookingPage.jsx';
+import MainPage from './pages/MainPage.jsx';
+import VisionPage from './pages/VisionPage.jsx';
+import EndpointPage from './pages/EndPointPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import UploadPage from './pages/UploadPage.jsx';
+import FileListPage from './pages/FileListPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
 
 function App() {
