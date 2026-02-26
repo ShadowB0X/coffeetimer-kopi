@@ -1,6 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import ServicesPage from './pages/ServicesPage';
+import PricesPage from './pages/PricesPage';
+import BookingPage from './pages/BookingPage';
 import MainPage from './pages/MainPage';
 import VisionPage from './pages/VisionPage';
 import EndpointPage from './pages/EndPointPage';
@@ -9,7 +12,7 @@ import UploadPage from './pages/UploadPage';
 import FileListPage from './pages/FileListPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './pages/Navbar';
+import Navbar from './pages/NavBar';
 import IntroPage from './pages/IntroPage'; 
 
 function App() {
