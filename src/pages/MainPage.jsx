@@ -7,8 +7,10 @@ import careImg from '../assets/card_care.png';
 export default function MainPage() {
   return (
     <div className={styles.page}>
-      <header className={styles.hero} style={{ backgroundImage: `url(${storefront})` }}>
+      <header className={styles.hero}>
+        <img className={styles.heroMedia} src={storefront} alt="ShortCut storefront" />
         <div className={styles.heroOverlay} />
+
         <div className={styles.heroInner}>
           <h1 className={styles.heroTitle}>Sharpen Your Style.</h1>
           <p className={styles.heroSub}>Premium cuts · fades · beard · styling</p>

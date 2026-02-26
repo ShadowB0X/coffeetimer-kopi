@@ -1,90 +1,51 @@
-/* --- Mobile improvements --- */
-
-/* iOS notch safe-area (optional but nice) */
-.page{
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* Hero: undgå tvungen 520px på små mobiler */
 .hero{
-  min-height: clamp(420px, 72vh, 620px);
-  padding: 0 16px 26px;
+  position: relative;
+  width: 100%;
+  /* Fullscreen feel */
+  min-height: 92vh;
+  display: grid;
+  place-items: end center;
+  padding: 0 18px 34px;
+  overflow: hidden;
 }
 
-/* Text: lidt mere plads og mindre risiko for overflow */
+/* iOS/Android: mere korrekt viewport når adresselinjen ændrer sig */
+@supports (height: 100dvh){
+  .hero{ min-height: 92dvh; }
+}
+
+.heroMedia{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: translateZ(0); /* hjælper iOS rendering */
+}
+
+/* Din overlay beholdes */
+.heroOverlay{
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 450px at 50% 90%, rgba(245,245,243,0.88), rgba(245,245,243,0.58) 40%, rgba(245,245,243,0.0) 75%),
+    linear-gradient(to bottom, rgba(245,245,243,0.15), rgba(245,245,243,0.60) 55%, rgba(245,245,243,0.88));
+  pointer-events: none;
+}
+
 .heroInner{
-  padding: 0 6px;
+  position: relative;
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+  z-index: 1;
 }
 
-/* Cards wrapper: mere luft på mobil */
-.cardsWrap{
-  padding: 18px 16px 60px;
-  margin-top: -10px;
-}
-
-/* Default: 3 kolonner på desktop (som du har) */
-.cards{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* Tablet: 2 kolonner */
-@media (max-width: 900px){
-  .cards{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .cardImage{
-    height: 190px;
-  }
-}
-
-/* Mobil: 1 kolonne + bedre spacing */
+/* Mobil: lidt mindre hero så cards ikke “forsvinder” */
 @media (max-width: 620px){
   .hero{
-    min-height: clamp(380px, 68vh, 560px);
+    min-height: 86vh;
     padding: 0 14px 22px;
-  }
-
-  /* Beholder dine farver — kun størrelse/spacing */
-  .heroTitle{
-    font-size: clamp(1.9rem, 8vw, 2.6rem);
-    margin-bottom: 8px;
-  }
-
-  .heroSub{
-    font-size: 0.98rem;
-    line-height: 1.35;
-  }
-
-  .cards{
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .card{
-    border-radius: 16px;
-  }
-
-  .cardImage{
-    height: 180px;
-  }
-
-  .cardBody{
-    padding: 14px 14px 16px;
-  }
-
-  .cardTitle{
-    font-size: 1.22rem;
-  }
-
-  .cardText{
-    font-size: 0.95rem;
-  }
-}
-
-/* Tiny phones (iPhone SE etc.) */
-@media (max-width: 380px){
-  .heroTitle{
-    font-size: 1.75rem;
   }
 }
