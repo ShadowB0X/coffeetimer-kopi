@@ -223,3 +223,9 @@
     font-size: 1.75rem;
   }
 }
+
+@media (max-width: 768px){
+  .heroMedia {
+    object-position: center 35%;
+  }
+}
