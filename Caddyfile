@@ -1,6 +1,13 @@
 shadowbox.dk {
-        root * /srv/timer
-        file_server
-        try_files {path} /index.html
-}
+  root * /srv/timer
+  encode gzip zstd
 
+  # 🔥 API requests går til Node server
+  handle /api/* {
+    reverse_proxy 127.0.0.1:5050
+  }
+
+  # Frontend
+  file_server
+  try_files {path} /index.html
+}
