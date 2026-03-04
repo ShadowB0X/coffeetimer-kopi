@@ -25,8 +25,8 @@ app.get("/api/notify-test", async (req, res) => {
 
 // --- MVP data (in-memory) ---
 const BARBERS = [
-  { id: "ali", name: "Ali" },
-  { id: "sam", name: "Sam" },
+  { id: "zana", name: "Zana" },
+  { id: "daniel", name: "Daniel" },
 ];
 
 const SERVICES = [
