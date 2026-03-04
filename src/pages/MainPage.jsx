@@ -12,6 +12,9 @@ export default function MainPage() {
         <div className={styles.heroOverlay} />
 
         <div className={styles.heroInner}>
+        <p className={styles.heroAddress}>
+    SHORTCUT · GAMMEL KONGEVEJ 91C
+  </p>
           <h1 className={styles.heroTitle}>Sharpen Your Style.</h1>
           <p className={styles.heroSub}>Premium cuts · fades · beard · styling</p>
         </div>
