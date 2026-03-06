@@ -1,423 +1,225 @@
-/* ===== Base container ===== */
-.container {
-  width: min(1200px, calc(100% - 32px));
-  margin: 0 auto;
-}
-
-/* ===== Section spacing ===== */
-.section {
-  padding: 72px 0;
-}
-
-@media (max-width: 768px) {
-  .section {
-    padding: 48px 0;
-  }
-}
-
-/* ===== Hero / heading area ===== */
-.heroCenter {
-  text-align: center;
-  padding: 72px 0 48px;
-}
-
-.heroEyebrow {
-  margin: 0 0 14px;
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #6f6765;
-}
-
-.heroTitle {
-  margin: 0;
-  font-size: clamp(2.4rem, 7vw, 5rem);
-  line-height: 1.02;
-  color: #403636;
-}
-
-.heroSubtitle {
-  margin: 18px auto 0;
-  max-width: 760px;
-  font-size: clamp(1rem, 2.4vw, 1.35rem);
-  line-height: 1.6;
-  color: #514847;
-}
-
-/* ===== Navbar ===== */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: rgba(245, 243, 240, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(64, 54, 54, 0.08);
-}
-
-.navInner {
-  width: min(1200px, calc(100% - 32px));
-  margin: 0 auto;
-  min-height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.logo {
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  font-weight: 700;
-  line-height: 1;
+.page{
+  background: #f5f5f3;
+  min-height: 100vh;
   color: #111;
-  text-decoration: none;
+  font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+
+  /* iOS notch safe-area */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 40px;
-}
-
-.navLinks a {
-  text-decoration: none;
-  color: #2f2b2a;
-  font-size: 1.05rem;
-  font-weight: 500;
-}
-
-.bookBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  padding: 0 24px;
-  border-radius: 16px;
-  border: 1px solid rgba(64, 54, 54, 0.18);
-  text-decoration: none;
-  color: #2f2b2a;
-  background: #f8f6f3;
-  font-weight: 600;
-  transition: all 0.25s ease;
-}
-
-.bookBtn:hover {
-  transform: translateY(-1px);
-  background: #fff;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-}
-
-/* ===== Mobile nav button ===== */
-.menuToggle {
-  display: none;
-  border: 0;
-  background: transparent;
-  font-size: 1.8rem;
-  line-height: 1;
-  cursor: pointer;
-  color: #2f2b2a;
-}
-
-.mobileMenu {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .navInner {
-    min-height: 76px;
-  }
-
-  .navLinks {
-    display: none;
-  }
-
-  .menuToggle {
-    display: inline-block;
-  }
-
-  .mobileMenu {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 0 16px 20px;
-    border-top: 1px solid rgba(64, 54, 54, 0.08);
-    background: #f5f3f0;
-  }
-
-  .mobileMenu a {
-    text-decoration: none;
-    color: #2f2b2a;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  .mobileBookBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 52px;
-    border-radius: 14px;
-    background: #5a4a49;
-    color: white !important;
-    font-weight: 600;
-  }
-}
-
-/* ===== Pricing grid ===== */
-.pricingGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-}
-
-@media (max-width: 900px) {
-  .pricingGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ===== Cards ===== */
-.card {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(64, 54, 54, 0.08);
-  border-radius: 28px;
-  padding: 28px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
-}
-
-.cardTitle {
-  margin: 0 0 18px;
-  color: #62b7eb;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  line-height: 1.1;
-}
-
-.priceList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.priceRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 12px 0 14px;
-  border-bottom: 1px solid rgba(64, 54, 54, 0.08);
-}
-
-.priceRow:last-child {
-  border-bottom: 0;
-}
-
-.serviceName {
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-  color: #2f2b2a;
-}
-
-.servicePrice {
-  white-space: nowrap;
-  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
-  font-weight: 700;
-  color: #4c403f;
-}
-
-.cardText {
-  margin-top: 20px;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #4f4645;
-}
-
-/* ===== CTA inside cards ===== */
-.primaryBtn {
-  display: inline-flex;
+.hero{
+  position: relative;
   width: 100%;
-  min-height: 56px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  background: #5f5251;
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-top: 18px;
-  transition: all 0.25s ease;
-}
 
-.primaryBtn:hover {
-  background: #4d4140;
-  transform: translateY(-1px);
-}
+  /* ✅ Desktop stable rollback */
+  min-height: 520px;
 
-/* ===== Tip box ===== */
-.tipBox {
-  margin-top: 28px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(64, 54, 54, 0.08);
-  border-radius: 24px;
-  padding: 26px 28px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
-}
+  /* If you use backgroundImage inline in JSX */
+  background-size: cover;
+  background-position: center;
 
-.tipTitle {
-  margin: 0 0 12px;
-  color: #403636;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-}
-
-.tipText {
-  margin: 0;
-  color: #4f4645;
-  line-height: 1.7;
-  font-size: 1rem;
-}
-
-/* ===== Product grid ===== */
-.productsGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  place-items: end center;
+  padding: 0 18px 34px;
+  overflow: hidden;
 }
 
-@media (max-width: 1100px) {
-  .productsGrid {
+/* ✅ Only mobile gets fullscreen feel */
+@media (max-width: 760px){
+  .hero{
+    min-height: 92vh;
+  }
+
+  @supports (height: 100dvh){
+    .hero{ min-height: 92dvh; }
+  }
+}
+
+/* Optional: only needed if you use <img className={styles.heroMedia} ...> */
+.heroMedia{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: translateZ(0);
+  z-index: 0;
+}
+
+.heroOverlay{
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 450px at 50% 90%, rgba(245,245,243,0.88), rgba(245,245,243,0.58) 40%, rgba(245,245,243,0.0) 75%),
+    linear-gradient(to bottom, rgba(245,245,243,0.15), rgba(245,245,243,0.60) 55%, rgba(245,245,243,0.88));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heroInner{
+  position: relative;
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+  z-index: 2;
+  padding: 0 6px;
+}
+
+/* ✅ Keep your new colors */
+.heroTitle{
+  font-size: clamp(2.3rem, 4.2vw, 3.2rem);
+  font-weight: 700;
+  margin: 0 0 10px;
+  letter-spacing: 0.01em;
+  color: #150101ba;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.heroSub{
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: 0.03em;
+  color: #2b2b2b;
+  text-shadow: 0 8px 20px rgba(0,0,0,0.28);
+}
+
+.cardsWrap{
+  padding: 26px 18px 70px;
+  margin-top: -12px;
+}
+
+.cards{
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+
+  /* ✅ Desktop: 3 columns */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card{
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.10);
+}
+
+.cardImage{
+  height: 210px;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+.cardBody{
+  padding: 16px 16px 18px;
+  text-align: center;
+}
+
+.iconRow{
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 10px;
+  opacity: 0.55;
+}
+
+.iconHat, .iconBeard, .iconCare{
+  width: 28px;
+  height: 20px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Simple inline SVG icons */
+.iconHat{
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M9 26c5-7 14-11 23-11s18 4 23 11h-7c-4-4-10-7-16-7s-12 3-16 7H9z'/%3E%3Cpath fill='%23111' d='M4 28h56v4H4z'/%3E%3C/svg%3E");
+}
+.iconBeard{
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M32 6c8 0 14 6 14 14 0 10-8 18-14 18S18 30 18 20C18 12 24 6 32 6zm0 6c-4 0-8 3-8 8 0 7 5 12 8 12s8-5 8-12c0-5-4-8-8-8z'/%3E%3C/svg%3E");
+}
+.iconCare{
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath fill='%23111' d='M14 30h10V12H14v18zm3-15h4v12h-4V15zM28 30h10V10H28v20zm3-17h4v14h-4V13zM42 30h8V16h-8v14zm3-11h2v8h-2v-8z'/%3E%3C/svg%3E");
+}
+
+.cardTitle{
+  font-size: 1.35rem;
+  margin: 0 0 6px;
+}
+
+.cardText{
+  margin: 0;
+  font-size: 0.98rem;
+  opacity: 0.78;
+}
+
+/* ✅ Tablet */
+@media (max-width: 900px){
+  .cards{
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .cardImage{
+    height: 190px;
+  }
 }
 
-@media (max-width: 640px) {
-  .productsGrid {
+/* ✅ Mobile */
+@media (max-width: 620px){
+  .hero{
+    padding: 0 14px 22px;
+  }
+
+  .heroTitle{
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+    margin-bottom: 8px;
+  }
+
+  .heroSub{
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .cardsWrap{
+    padding: 18px 16px 60px;
+    margin-top: -10px;
+  }
+
+  .cards{
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card{
+    border-radius: 16px;
+  }
+
+  .cardImage{
+    height: 180px;
+  }
+
+  .cardBody{
+    padding: 14px 14px 16px;
+  }
+
+  .cardTitle{
+    font-size: 1.22rem;
+  }
+
+  .cardText{
+    font-size: 0.95rem;
   }
 }
 
-.productCard {
-  overflow: hidden;
-  border-radius: 22px;
-  background: #fff;
-  border: 1px solid rgba(64, 54, 54, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.productCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
-}
-
-.productImage {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  display: block;
-}
-
-.productBody {
-  padding: 22px 18px 24px;
-  text-align: center;
-}
-
-.productTitle {
-  margin: 0 0 12px;
-  font-size: clamp(1.3rem, 3vw, 2rem);
-  line-height: 1.15;
-  color: #1f1b1a;
-}
-
-.productPrice {
-  margin: 0;
-  font-size: clamp(1.15rem, 2.5vw, 1.7rem);
-  font-weight: 700;
-  color: #2f2b2a;
-}
-
-/* ===== Reviews ===== */
-.reviewsSection {
-  text-align: center;
-}
-
-.reviewsEyebrow {
-  margin: 0 0 10px;
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #7b7371;
-}
-
-.reviewsTitle {
-  margin: 0;
-  font-size: clamp(2rem, 6vw, 4rem);
-  color: #403636;
-}
-
-.reviewsSummary {
-  margin-top: 16px;
-  color: #514847;
-  font-size: 1.1rem;
-}
-
-.reviewsGrid {
-  margin-top: 32px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-@media (max-width: 900px) {
-  .reviewsGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.reviewCard {
-  text-align: left;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(64, 54, 54, 0.08);
-  border-radius: 24px;
-  padding: 22px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-}
-
-.reviewStars {
-  margin-bottom: 12px;
-  font-size: 18px;
-}
-
-.reviewText {
-  margin: 0 0 12px;
-  line-height: 1.65;
-  color: #403636;
-}
-
-.reviewAuthor {
-  color: #7b7371;
-  font-size: 14px;
-}
-
-/* ===== Small screen tuning ===== */
-@media (max-width: 640px) {
-  .container,
-  .navInner {
-    width: min(1200px, calc(100% - 24px));
-  }
-
-  .heroCenter {
-    padding: 52px 0 32px;
-  }
-
-  .card {
-    padding: 22px 18px;
-    border-radius: 22px;
-  }
-
-  .tipBox {
-    padding: 22px 18px;
-    border-radius: 20px;
-  }
-
-  .productBody {
-    padding: 18px 16px 20px;
+/* ✅ Tiny phones */
+@media (max-width: 380px){
+  .heroTitle{
+    font-size: 1.75rem;
   }
 }
