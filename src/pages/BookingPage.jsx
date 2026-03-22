@@ -10,7 +10,10 @@ const todayISODate = () => {
 };
 
 const formatTime = (iso) =>
-  new Date(iso).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
+  new Date(iso).toLocaleTimeString("da-DK", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
 export default function BookingPage() {
   const [barbers, setBarbers] = useState([]);
@@ -30,15 +33,22 @@ export default function BookingPage() {
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
 
-  // load barbers + services
   useEffect(() => {
     (async () => {
       setLoading(true);
       setErr("");
+
       try {
-        const [bRes, sRes] = await Promise.all([fetch("/api/barbers"), fetch("/api/services")]);
+        const [bRes, sRes] = await Promise.all([
+          fetch("/api/barbers"),
+          fetch("/api/services"),
+        ]);
+
         const b = await bRes.json();
         const s = await sRes.json();
+
+        console.log("barbers:", b);
+        console.log("services:", s);
 
         if (!b?.ok) throw new Error(b?.error || "Kunne ikke hente frisører");
         if (!s?.ok) throw new Error(s?.error || "Kunne ikke hente services");
@@ -46,9 +56,13 @@ export default function BookingPage() {
         setBarbers(b.barbers || []);
         setServices(s.services || []);
 
-        // default selection
-        if ((b.barbers || []).length) setBarberId(b.barbers[0].id);
-        if ((s.services || []).length) setServiceId(s.services[0].id);
+        if ((b.barbers || []).length > 0) {
+          setBarberId(b.barbers[0].id);
+        }
+
+        if ((s.services || []).length > 0) {
+          setServiceId(s.services[0].id);
+        }
       } catch (e) {
         setErr(String(e?.message || e));
       } finally {
@@ -57,7 +71,6 @@ export default function BookingPage() {
     })();
   }, []);
 
-  // load slots when barber/date changes
   useEffect(() => {
     if (!barberId || !date) return;
 
@@ -65,10 +78,15 @@ export default function BookingPage() {
       setLoadingSlots(true);
       setErr("");
       setSlot("");
+
       try {
         const r = await fetch(`/api/availability?date=${date}&barberId=${barberId}`);
         const data = await r.json();
+
+        console.log("availability:", data);
+
         if (!data?.ok) throw new Error(data?.error || "Kunne ikke hente tider");
+
         setSlots(data.slots || []);
       } catch (e) {
         setSlots([]);
@@ -103,13 +121,16 @@ export default function BookingPage() {
       });
 
       const data = await r.json().catch(() => ({}));
-      if (!r.ok || !data.ok) throw new Error(data?.error || "Booking fejlede");
+      console.log("booking response:", data);
+
+      if (!r.ok || !data.ok) {
+        throw new Error(data?.error || "Booking fejlede");
+      }
 
       setMsg("✅ Booking oprettet! (Telegram sendt)");
       setName("");
       setPhone("");
 
-      // refresh slots
       const r2 = await fetch(`/api/availability?date=${date}&barberId=${barberId}`);
       const d2 = await r2.json();
       if (d2?.ok) setSlots(d2.slots || []);
@@ -127,12 +148,16 @@ export default function BookingPage() {
         <p className={styles.sub}>Vælg frisør, service og tid.</p>
       </header>
 
-      <form className={styles.card} onSubmit={submit}>
+      <form className={styles.card} onSubmit={submit} noValidate>
         <div className={styles.grid}>
           <label className={styles.field}>
             <span>Frisør</span>
-            <select value={barberId} onChange={(e) => setBarberId(e.target.value)} disabled={loading}>
-              <option value="" disabled>
+            <select
+              value={barberId}
+              onChange={(e) => setBarberId(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">
                 {loading ? "Henter..." : "Vælg frisør"}
               </option>
               {barbers.map((b) => (
@@ -145,8 +170,12 @@ export default function BookingPage() {
 
           <label className={styles.field}>
             <span>Service</span>
-            <select value={serviceId} onChange={(e) => setServiceId(e.target.value)} disabled={loading}>
-              <option value="" disabled>
+            <select
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">
                 {loading ? "Henter..." : "Vælg service"}
               </option>
               {services.map((s) => (
@@ -159,13 +188,21 @@ export default function BookingPage() {
 
           <label className={styles.field}>
             <span>Dato</span>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
           </label>
 
           <label className={styles.field}>
             <span>Tid</span>
-            <select value={slot} onChange={(e) => setSlot(e.target.value)} disabled={loadingSlots || !barberId}>
-              <option value="" disabled>
+            <select
+              value={slot}
+              onChange={(e) => setSlot(e.target.value)}
+              disabled={loadingSlots || !barberId}
+            >
+              <option value="">
                 {loadingSlots ? "Henter tider..." : "Vælg tid"}
               </option>
               {slots.map((iso) => (
@@ -178,12 +215,22 @@ export default function BookingPage() {
 
           <label className={styles.field}>
             <span>Navn</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Dit navn" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Dit navn"
+            />
           </label>
 
           <label className={styles.field}>
             <span>Telefon (valgfrit)</span>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="fx 12 34 56 78" />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="fx 12 34 56 78"
+            />
           </label>
         </div>
 
@@ -191,7 +238,12 @@ export default function BookingPage() {
           Book tid
         </button>
 
-        {err && <p className={styles.msg} style={{ color: "#8b0000" }}>{err}</p>}
+        {err && (
+          <p className={styles.msg} style={{ color: "#8b0000" }}>
+            {err}
+          </p>
+        )}
+
         {msg && <p className={styles.msg}>{msg}</p>}
       </form>
     </div>
