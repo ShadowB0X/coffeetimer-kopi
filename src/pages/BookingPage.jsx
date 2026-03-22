@@ -47,9 +47,6 @@ export default function BookingPage() {
         const b = await bRes.json();
         const s = await sRes.json();
 
-        console.log("barbers:", b);
-        console.log("services:", s);
-
         if (!b?.ok) throw new Error(b?.error || "Kunne ikke hente frisører");
         if (!s?.ok) throw new Error(s?.error || "Kunne ikke hente services");
 
@@ -82,8 +79,6 @@ export default function BookingPage() {
       try {
         const r = await fetch(`/api/availability?date=${date}&barberId=${barberId}`);
         const data = await r.json();
-
-        console.log("availability:", data);
 
         if (!data?.ok) throw new Error(data?.error || "Kunne ikke hente tider");
 
@@ -121,19 +116,22 @@ export default function BookingPage() {
       });
 
       const data = await r.json().catch(() => ({}));
-      console.log("booking response:", data);
 
       if (!r.ok || !data.ok) {
         throw new Error(data?.error || "Booking fejlede");
       }
 
-      setMsg("✅ Booking oprettet! (Telegram sendt)");
+      setMsg("✅ Booking oprettet! Vi har modtaget din booking.");
       setName("");
       setPhone("");
 
       const r2 = await fetch(`/api/availability?date=${date}&barberId=${barberId}`);
       const d2 = await r2.json();
-      if (d2?.ok) setSlots(d2.slots || []);
+
+      if (d2?.ok) {
+        setSlots(d2.slots || []);
+      }
+
       setSlot("");
     } catch (e) {
       setErr(String(e?.message || e));
@@ -148,104 +146,122 @@ export default function BookingPage() {
         <p className={styles.sub}>Vælg frisør, service og tid.</p>
       </header>
 
-      <form className={styles.card} onSubmit={submit} noValidate>
-        <div className={styles.grid}>
-          <label className={styles.field}>
-            <span>Frisør</span>
-            <select
-              value={barberId}
-              onChange={(e) => setBarberId(e.target.value)}
-              disabled={loading}
-            >
-              <option value="">
-                {loading ? "Henter..." : "Vælg frisør"}
-              </option>
-              {barbers.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
+      <div className={styles.shell}>
+        <form className={styles.card} onSubmit={submit} noValidate>
+          <div className={styles.grid}>
+            <label className={styles.field}>
+              <span>Frisør</span>
+              <select
+                value={barberId}
+                onChange={(e) => setBarberId(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">
+                  {loading ? "Henter..." : "Vælg frisør"}
                 </option>
-              ))}
-            </select>
-          </label>
+                {barbers.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={styles.field}>
-            <span>Service</span>
-            <select
-              value={serviceId}
-              onChange={(e) => setServiceId(e.target.value)}
-              disabled={loading}
-            >
-              <option value="">
-                {loading ? "Henter..." : "Vælg service"}
-              </option>
-              {services.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} · {s.price} kr
+            <label className={styles.field}>
+              <span>Service</span>
+              <select
+                value={serviceId}
+                onChange={(e) => setServiceId(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">
+                  {loading ? "Henter..." : "Vælg service"}
                 </option>
-              ))}
-            </select>
-          </label>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} · {s.price} kr
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={styles.field}>
-            <span>Dato</span>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </label>
+            <label className={styles.field}>
+              <span>Dato</span>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </label>
 
-          <label className={styles.field}>
-            <span>Tid</span>
-            <select
-              value={slot}
-              onChange={(e) => setSlot(e.target.value)}
-              disabled={loadingSlots || !barberId}
-            >
-              <option value="">
-                {loadingSlots ? "Henter tider..." : "Vælg tid"}
-              </option>
-              {slots.map((iso) => (
-                <option key={iso} value={iso}>
-                  {formatTime(iso)}
+            <label className={styles.field}>
+              <span>Tid</span>
+              <select
+                value={slot}
+                onChange={(e) => setSlot(e.target.value)}
+                disabled={loadingSlots || !barberId}
+              >
+                <option value="">
+                  {loadingSlots ? "Henter tider..." : "Vælg tid"}
                 </option>
-              ))}
-            </select>
-          </label>
+                {slots.map((iso) => (
+                  <option key={iso} value={iso}>
+                    {formatTime(iso)}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className={styles.field}>
-            <span>Navn</span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Dit navn"
-            />
-          </label>
+            <label className={styles.field}>
+              <span>Navn</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Dit navn"
+                autoComplete="name"
+              />
+            </label>
 
-          <label className={styles.field}>
-            <span>Telefon (valgfrit)</span>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="fx 12 34 56 78"
-            />
-          </label>
-        </div>
+            <label className={styles.field}>
+              <span>Telefon (valgfrit)</span>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="fx 12 34 56 78"
+                autoComplete="tel"
+                inputMode="tel"
+              />
+            </label>
+          </div>
 
-        <button className={styles.button} type="submit">
-          Book tid
-        </button>
+          <button className={styles.button} type="submit">
+            Book tid
+          </button>
 
-        {err && (
-          <p className={styles.msg} style={{ color: "#8b0000" }}>
-            {err}
-          </p>
-        )}
+          {err && (
+            <p className={styles.msg} style={{ color: "#8b0000" }}>
+              {err}
+            </p>
+          )}
 
-        {msg && <p className={styles.msg}>{msg}</p>}
-      </form>
+          {msg && <p className={styles.msg}>{msg}</p>}
+        </form>
+
+        <aside className={styles.side}>
+          <div className={styles.sideCard}>
+            <h3>Information</h3>
+            <p>Vælg frisør, ønsket service og et ledigt tidspunkt.</p>
+          </div>
+
+          <div className={styles.sideCard}>
+            <h3>Adresse</h3>
+            <p>Gammel Kongevej 91C</p>
+            <p>1850 Frederiksberg</p>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
