@@ -1,8 +1,9 @@
 shadowbox.dk {
-  root * /srv/timer
-  file_server
-  try_files {path} /index.html
+    handle_path /api/* {
+        reverse_proxy 172.19.0.1:5050
+    }
 
-  @api path /api/*
-  reverse_proxy @api 127.0.0.1:5050
+    root * /srv/timer
+    file_server
+    try_files {path} /index.html
 }
