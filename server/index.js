@@ -1,29 +1,20 @@
 import express from "express";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import pg from "pg";
 import { sendTelegramMessage } from "./telegram.js";
 
 dotenv.config({ path: ".env.local" });
 
+const { Pool } = pg;
+
 const app = express();
 app.use(express.json());
 
-// Healthcheck
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true, status: "server up" });
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
 
-// Test Telegram
-app.get("/api/notify-test", async (req, res) => {
-  try {
-    const data = await sendTelegramMessage("✅ *ShortCut* — Telegram notifikation virker!");
-    res.json({ ok: true, data });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});
-
-// --- MVP data (in-memory) ---
 const BARBERS = [
   { id: "zana", name: "Zana" },
   { id: "daniel", name: "Daniel" },
@@ -36,57 +27,165 @@ const SERVICES = [
   { id: "beard", name: "Skæg (fra)", price: 100, durationMin: 15 },
 ];
 
-const BOOKINGS = [];
-
-function isIsoDateTime(s) {
-  const d = new Date(s);
-  return Number.isFinite(d.getTime()) && typeof s === "string" && s.includes("T");
+function isIsoDateTime(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) && typeof value === "string" && value.includes("T");
 }
-function overlaps(aStart, aEnd, bStart, bEnd) {
+
+function findBarber(barberId) {
+  return BARBERS.find((barber) => barber.id === barberId);
+}
+
+function findService(serviceId) {
+  return SERVICES.find((service) => service.id === serviceId);
+}
+
+function timeOverlaps(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd;
 }
 
-// List barbers + services
-app.get("/api/barbers", (req, res) => res.json({ ok: true, barbers: BARBERS }));
-app.get("/api/services", (req, res) => res.json({ ok: true, services: SERVICES }));
+async function findConflictingBooking({ barberId, startTime, endTime }) {
+  const result = await db.query(
+    `
+    SELECT booking_id, start_time, end_time
+    FROM bookings
+    WHERE barber_id = $1
+      AND booking_status = 'active'
+      AND start_time < $3
+      AND end_time > $2
+    LIMIT 1
+    `,
+    [barberId, startTime, endTime]
+  );
 
-// Availability
-app.get("/api/availability", (req, res) => {
-  const { date, barberId } = req.query;
+  return result.rows[0] || null;
+}
 
-  if (!date || !barberId) {
-    return res.status(400).json({ ok: false, error: "Missing date or barberId" });
+async function getBookingsForDate({ barberId, date }) {
+  const dayStart = new Date(`${date}T00:00:00`);
+  const dayEnd = new Date(`${date}T23:59:59`);
+
+  const result = await db.query(
+    `
+    SELECT booking_id, barber_id, service_id, start_time, end_time
+    FROM bookings
+    WHERE barber_id = $1
+      AND booking_status = 'active'
+      AND start_time >= $2
+      AND start_time <= $3
+    ORDER BY start_time ASC
+    `,
+    [barberId, dayStart, dayEnd]
+  );
+
+  return result.rows;
+}
+
+app.get("/api/health", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+    res.json({ ok: true, status: "server up", database: "connected" });
+  } catch (err) {
+    res.status(500).json({ ok: false, status: "server up", database: "not connected" });
   }
-
-  const dayStart = new Date(`${date}T10:00:00`);
-  const dayEnd = new Date(`${date}T18:00:00`);
-
-  if (!Number.isFinite(dayStart.getTime())) {
-    return res.status(400).json({ ok: false, error: "Invalid date format (use YYYY-MM-DD)" });
-  }
-
-  const slotMin = 30;
-  const slots = [];
-
-  for (let t = new Date(dayStart); t < dayEnd; t = new Date(t.getTime() + slotMin * 60_000)) {
-    const start = new Date(t);
-    const end = new Date(t.getTime() + slotMin * 60_000);
-
-    const busy = BOOKINGS.some((b) => {
-      if (b.barberId !== barberId) return false;
-      const bStart = new Date(b.startISO);
-      const svc = SERVICES.find((s) => s.id === b.serviceId);
-      const bEnd = new Date(bStart.getTime() + (svc?.durationMin ?? 30) * 60_000);
-      return overlaps(start, end, bStart, bEnd);
-    });
-
-    if (!busy) slots.push(start.toISOString());
-  }
-
-  res.json({ ok: true, slots });
 });
 
-// Create booking + telegram
+app.get("/api/notify-test", async (req, res) => {
+  try {
+    const data = await sendTelegramMessage("✅ *ShortCut* — Telegram notifikation virker!");
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+app.get("/api/barbers", (req, res) => {
+  res.json({ ok: true, barbers: BARBERS });
+});
+
+app.get("/api/services", (req, res) => {
+  res.json({ ok: true, services: SERVICES });
+});
+
+app.get("/api/availability", async (req, res) => {
+  try {
+    const { date, barberId } = req.query;
+
+    if (!date || !barberId) {
+      return res.status(400).json({ ok: false, error: "Missing date or barberId" });
+    }
+
+    const barber = findBarber(barberId);
+    if (!barber) {
+      return res.status(400).json({ ok: false, error: "Invalid barberId" });
+    }
+
+    const dayStart = new Date(`${date}T10:00:00`);
+    const dayEnd = new Date(`${date}T18:00:00`);
+
+    if (!Number.isFinite(dayStart.getTime())) {
+      return res.status(400).json({ ok: false, error: "Invalid date format. Use YYYY-MM-DD" });
+    }
+
+    const existingBookings = await getBookingsForDate({ barberId, date });
+    const slotDurationMin = 30;
+    const slots = [];
+
+    for (
+      let current = new Date(dayStart);
+      current < dayEnd;
+      current = new Date(current.getTime() + slotDurationMin * 60_000)
+    ) {
+      const slotStart = new Date(current);
+      const slotEnd = new Date(current.getTime() + slotDurationMin * 60_000);
+
+      const isBusy = existingBookings.some((booking) => {
+        const bookingStart = new Date(booking.start_time);
+        const bookingEnd = new Date(booking.end_time);
+
+        return timeOverlaps(slotStart, slotEnd, bookingStart, bookingEnd);
+      });
+
+      if (!isBusy) {
+        slots.push(slotStart.toISOString());
+      }
+    }
+
+    res.json({ ok: true, slots });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+app.get("/api/bookings", async (req, res) => {
+  try {
+    const result = await db.query(
+      `
+      SELECT
+        booking_id,
+        barber_id,
+        barber_name,
+        service_id,
+        service_name,
+        service_price,
+        service_duration_min,
+        customer_name,
+        customer_phone,
+        start_time,
+        end_time,
+        booking_status,
+        created_at
+      FROM bookings
+      ORDER BY start_time DESC
+      `
+    );
+
+    res.json({ ok: true, bookings: result.rows });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
 app.post("/api/bookings", async (req, res) => {
   try {
     const { barberId, serviceId, startISO, customerName, customerPhone } = req.body || {};
@@ -94,59 +193,125 @@ app.post("/api/bookings", async (req, res) => {
     if (!barberId || !serviceId || !startISO || !customerName) {
       return res.status(400).json({
         ok: false,
-        error: "Missing fields (barberId, serviceId, startISO, customerName)",
+        error: "Missing fields: barberId, serviceId, startISO, customerName",
       });
     }
 
     if (!isIsoDateTime(startISO)) {
-      return res.status(400).json({ ok: false, error: "startISO must be ISO datetime string" });
+      return res.status(400).json({
+        ok: false,
+        error: "startISO must be a valid ISO datetime string",
+      });
     }
 
-    const barber = BARBERS.find((b) => b.id === barberId);
-    const service = SERVICES.find((s) => s.id === serviceId);
+    const barber = findBarber(barberId);
+    const service = findService(serviceId);
+
     if (!barber || !service) {
-      return res.status(400).json({ ok: false, error: "Invalid barberId or serviceId" });
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid barberId or serviceId",
+      });
     }
 
-    const start = new Date(startISO);
-    const end = new Date(start.getTime() + service.durationMin * 60_000);
+    const startTime = new Date(startISO);
+    const endTime = new Date(startTime.getTime() + service.durationMin * 60_000);
 
-    const conflict = BOOKINGS.some((b) => {
-      if (b.barberId !== barberId) return false;
-      const bStart = new Date(b.startISO);
-      const bSvc = SERVICES.find((s) => s.id === b.serviceId);
-      const bEnd = new Date(bStart.getTime() + (bSvc?.durationMin ?? 30) * 60_000);
-      return overlaps(start, end, bStart, bEnd);
+    const conflict = await findConflictingBooking({
+      barberId,
+      startTime,
+      endTime,
     });
 
-    if (conflict) return res.status(409).json({ ok: false, error: "Time slot already booked" });
+    if (conflict) {
+      return res.status(409).json({
+        ok: false,
+        error: "Tiden er allerede booket",
+      });
+    }
 
-    const booking = {
-      id: crypto.randomUUID(),
-      barberId,
-      serviceId,
-      startISO,
-      customerName,
-      customerPhone: customerPhone || "",
-    };
+    const bookingId = crypto.randomUUID();
+    const cleanCustomerName = customerName.trim();
+    const cleanCustomerPhone = customerPhone?.trim() || "";
 
-    BOOKINGS.push(booking);
+    const insertResult = await db.query(
+      `
+      INSERT INTO bookings (
+        booking_id,
+        barber_id,
+        barber_name,
+        service_id,
+        service_name,
+        service_price,
+        service_duration_min,
+        customer_name,
+        customer_phone,
+        start_time,
+        end_time
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+      RETURNING *
+      `,
+      [
+        bookingId,
+        barber.id,
+        barber.name,
+        service.id,
+        service.name,
+        service.price,
+        service.durationMin,
+        cleanCustomerName,
+        cleanCustomerPhone,
+        startTime,
+        endTime,
+      ]
+    );
+
+    const savedBooking = insertResult.rows[0];
 
     const msg =
       `📅 *Ny booking!*\n` +
-      `👤 *Kunde:* ${customerName}${customerPhone ? ` (${customerPhone})` : ""}\n` +
+      `👤 *Kunde:* ${cleanCustomerName}${cleanCustomerPhone ? ` (${cleanCustomerPhone})` : ""}\n` +
       `💈 *Frisør:* ${barber.name}\n` +
       `✂️ *Service:* ${service.name} (${service.price} kr)\n` +
-      `🕒 *Tid:* ${new Date(startISO).toLocaleString("da-DK")}\n` +
+      `⏱️ *Varighed:* ${service.durationMin} min\n` +
+      `🕒 *Tid:* ${startTime.toLocaleString("da-DK")}\n` +
       `📍 *Adresse:* Gammel Kongevej 91C`;
 
     await sendTelegramMessage(msg);
 
-    res.json({ ok: true, booking });
+    res.json({ ok: true, booking: savedBooking });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+app.patch("/api/bookings/:bookingId/cancel", async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const result = await db.query(
+      `
+      UPDATE bookings
+      SET booking_status = 'cancelled'
+      WHERE booking_id = $1
+      RETURNING *
+      `,
+      [bookingId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Booking not found" });
+    }
+
+    res.json({ ok: true, booking: result.rows[0] });
   } catch (err) {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
 
 const port = Number(process.env.SERVER_PORT || 5050);
-app.listen(port, () => console.log(`API server running on http://localhost:${port}`));
+
+app.listen(port, () => {
+  console.log(`API server running on http://localhost:${port}`);
+});
