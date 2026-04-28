@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-import ServicesPage from './pages/ServicesPage.jsx';
+import ServicesPage from './pages/ProductsPage.jsx';
 import PricesPage from './pages/PricesPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
 import MainPage from './pages/MainPage.jsx';
@@ -14,6 +14,7 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
+import ProductsPage from './pages/ProductsPage.jsx';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -49,7 +50,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services" element={<ProductsPage/>} />
         <Route path="/prices" element={<PricesPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
