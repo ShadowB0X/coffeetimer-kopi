@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import styles from '../components/ProductPage.module.css';
+import PropTypes from 'prop-types';
 
-export default function ProductPage() {
+export default function ProductPage({ isAdmin = false }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -91,60 +92,67 @@ export default function ProductPage() {
       </header>
 
       <div className={styles.layout}>
-        <form className={styles.card} onSubmit={handleSubmit}>
-          <div className={styles.grid}>
-            <label className={styles.field}>
-              <span>Navn</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="fx Totex Hair Gel"
-              />
-            </label>
+        {isAdmin ? (
+          <form className={styles.card} onSubmit={handleSubmit}>
+            <div className={styles.grid}>
+              <label className={styles.field}>
+                <span>Navn</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="fx Totex Hair Gel"
+                />
+              </label>
 
-            <label className={styles.field}>
-              <span>Pris</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="fx 90"
-              />
-            </label>
+              <label className={styles.field}>
+                <span>Pris</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="fx 90"
+                />
+              </label>
 
-            <label className={styles.field}>
-              <span>Lagerantal</span>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={stockQuantity}
-                onChange={(e) => setStockQuantity(e.target.value)}
-                placeholder="fx 12"
-              />
-            </label>
+              <label className={styles.field}>
+                <span>Lagerantal</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={stockQuantity}
+                  onChange={(e) => setStockQuantity(e.target.value)}
+                  placeholder="fx 12"
+                />
+              </label>
 
-            <label className={`${styles.field} ${styles.fullWidth}`}>
-              <span>Beskrivelse</span>
-              <textarea
-                rows="5"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Kort beskrivelse af produktet"
-              />
-            </label>
-          </div>
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span>Beskrivelse</span>
+                <textarea
+                  rows="5"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Kort beskrivelse af produktet"
+                />
+              </label>
+            </div>
 
-          <button className={styles.button} type="submit" disabled={saving}>
-            {saving ? 'Opretter...' : 'Opret'}
-          </button>
+            <button className={styles.button} type="submit" disabled={saving}>
+              {saving ? 'Opretter...' : 'Opret'}
+            </button>
 
-          {error && <p className={styles.error}>{error}</p>}
-          {success && <p className={styles.success}>{success}</p>}
-        </form>
+            {error && <p className={styles.error}>{error}</p>}
+            {success && <p className={styles.success}>{success}</p>}
+          </form>
+        ) : (
+          <aside className={styles.card}>
+            <h3>Adgang nægtet</h3>
+            <p>Produktformularen vises kun for en bruger, der er logget ind med admin-token.</p>
+          </aside>
+        )}
 
         <aside className={styles.sidebar}>
           <div className={styles.sideCard}>
@@ -182,3 +190,7 @@ export default function ProductPage() {
     </div>
   );
 }
+
+ProductPage.propTypes = {
+  isAdmin: PropTypes.bool,
+};

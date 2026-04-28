@@ -18,29 +18,29 @@ import IntroPage from './pages/IntroPage';
 
 function App() {
   const [token, setToken] = useState(null);
-  const [username, setUsername] = useState(null);
+  const [adminToken, setAdminToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
+    const storedAdminToken = localStorage.getItem('adminToken');
     if (storedToken) setToken(storedToken);
-    if (storedUsername) setUsername(storedUsername);
+    if (storedAdminToken) setAdminToken(storedAdminToken);
     setIsLoading(false);
   }, []);
 
-  const handleLogin = (newToken, userEmail) => {
+  const handleLogin = (newToken, userEmail, isAdmin = false) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('username', userEmail);
     setToken(newToken);
-    setUsername(userEmail);
-  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    setToken(null);
-    setUsername(null);
+    if (isAdmin) {
+      localStorage.setItem('adminToken', newToken);
+      setAdminToken(newToken);
+    } else {
+      localStorage.removeItem('adminToken');
+      setAdminToken(null);
+    }
   };
 
   if (isLoading) return null;
@@ -58,8 +58,8 @@ function App() {
         <Route
           path="/products"
           element={
-            <ProtectedRoute token={token}>
-              <ProductPage />
+            <ProtectedRoute token={adminToken}>
+              <ProductPage isAdmin={Boolean(adminToken)} />
             </ProtectedRoute>
           }
         />

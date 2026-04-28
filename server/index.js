@@ -1,12 +1,19 @@
+/* global process */
+
 import express from "express";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import pg from "pg";
 import { sendTelegramMessage } from "./telegram.js";
+import productRoutes from "./products.js";
 
 dotenv.config({ path: ".env.local" });
 
 const { Pool } = pg;
+
+if (!process.env.DATABASE_URL) {
+  console.warn("DATABASE_URL is missing. Create a .env.local file in the project root with a valid PostgreSQL connection string.");
+}
 
 const app = express();
 app.use(express.json());
@@ -14,6 +21,14 @@ app.use(express.json());
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+app.use("/api/products", productRoutes(db));
+
+const ADMIN_USER = {
+  email: "admin@coffeetimer.local",
+  password: "admin123",
+  token: "coffeetimer-admin-token",
+};
 
 const BARBERS = [
   { id: "zana", name: "Zana" },
@@ -101,6 +116,31 @@ app.get("/api/notify-test", async (req, res) => {
   }
 });
 
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    const cleanPassword = String(password || "");
+
+    if (cleanEmail !== ADMIN_USER.email || cleanPassword !== ADMIN_USER.password) {
+      return res.status(401).json({ ok: false, error: "Invalid admin credentials" });
+    }
+
+    res.json({
+      ok: true,
+      token: ADMIN_USER.token,
+      user: {
+        email: ADMIN_USER.email,
+        role: "admin",
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+/*
+tror ikke denne bruges. fjernes?
 app.get("/api/products", async (req, res) => {
   try {
     const products = await getProductsFromDb();
@@ -108,8 +148,10 @@ app.get("/api/products", async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
-});
+});*/
 
+/*
+samme her. product-funktionalitet flyttet over til "products.js"
 app.post("/api/products", async (req, res) => {
   try {
     const { name, price, stockQuantity, description } = req.body || {};
@@ -142,7 +184,7 @@ app.post("/api/products", async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
-});
+});*/
 
 app.get("/api/barbers", (req, res) => {
   res.json({ ok: true, barbers: BARBERS });

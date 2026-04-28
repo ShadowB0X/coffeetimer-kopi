@@ -1,10 +1,10 @@
 import { Navigate, useLocation } from 'react-router-dom';
 
-export default function ProtectedRoute({ token, children }) {
+export default function ProtectedRoute({ token, children, redirectTo = '/login' }) {
   const location = useLocation();
 
   if (!token) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 
   return children;
