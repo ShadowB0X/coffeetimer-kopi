@@ -1,0 +1,43 @@
+/* 🔥 GLOBAL HERO (bruges på alle pages) */
+.pageHero{
+    position:relative;
+    min-height:280px;
+  
+    background-image: url('../assets/hero-clean.jpg');
+    background-size:cover;
+    background-position:center right;
+  
+    display:flex;
+    align-items:flex-end;
+    padding:40px 9vw;
+  }
+  
+  /* mørk overlay så tekst er læsbar */
+  .pageHero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+      90deg,
+      rgba(0,0,0,.75) 0%,
+      rgba(0,0,0,.45) 40%,
+      rgba(0,0,0,.15) 70%,
+      transparent 100%
+    );
+  }
+  
+  /* tekst ovenpå */
+  .pageHeroContent{
+    position:relative;
+    z-index:2;
+  }
+  
+  .pageHeroTitle{
+    font-size:clamp(2rem, 4vw, 3rem);
+    margin:0;
+  }
+  
+  .pageHeroSub{
+    margin-top:8px;
+    opacity:.75;
+  }
