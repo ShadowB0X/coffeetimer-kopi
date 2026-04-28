@@ -81,6 +81,8 @@ async function getBookingsForDate({ barberId, date }) {
   return result.rows;
 }
 
+
+
 app.get("/api/health", async (req, res) => {
   try {
     await db.query("SELECT 1");
@@ -94,6 +96,49 @@ app.get("/api/notify-test", async (req, res) => {
   try {
     const data = await sendTelegramMessage("✅ *ShortCut* — Telegram notifikation virker!");
     res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+app.get("/api/products", async (req, res) => {
+  try {
+    const products = await getProductsFromDb();
+    res.json({ ok: true, products });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
+app.post("/api/products", async (req, res) => {
+  try {
+    const { name, price, stockQuantity, description } = req.body || {};
+
+    const cleanName = String(name || "").trim();
+    const numericPrice = Number(price);
+    const numericStockQuantity = Number(stockQuantity);
+    const cleanDescription = String(description || "").trim();
+
+    if (!cleanName) {
+      return res.status(400).json({ ok: false, error: "Missing field: name" });
+    }
+
+    if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+      return res.status(400).json({ ok: false, error: "Invalid field: price must be a number >= 0" });
+    }
+
+    if (!Number.isInteger(numericStockQuantity) || numericStockQuantity < 0) {
+      return res.status(400).json({ ok: false, error: "Invalid field: stockQuantity must be an integer >= 0" });
+    }
+
+    const product = await createProductInDb({
+      name: cleanName,
+      price: numericPrice,
+      stockQuantity: numericStockQuantity,
+      description: cleanDescription,
+    });
+
+    res.status(201).json({ ok: true, product });
   } catch (err) {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
@@ -309,6 +354,8 @@ app.patch("/api/bookings/:bookingId/cancel", async (req, res) => {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
+
+
 
 const port = Number(process.env.SERVER_PORT || 5050);
 

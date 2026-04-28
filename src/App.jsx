@@ -6,6 +6,7 @@ import PricesPage from './pages/PricesPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
 import MainPage from './pages/MainPage.jsx';
 import VisionPage from './pages/VisionPage.jsx';
+import ProductPage from './pages/ProductPage.jsx';
 import EndpointPage from './pages/EndPointPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import UploadPage from './pages/UploadPage.jsx';
@@ -54,6 +55,14 @@ function App() {
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/vision" element={<VisionPage />} />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute token={token}>
+              <ProductPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/endpoints" element={<EndpointPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/register" element={<RegisterPage />} />

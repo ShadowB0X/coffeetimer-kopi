@@ -1,0 +1,197 @@
+.page {
+  min-height: 100vh;
+  padding: 120px 24px 80px;
+  background: linear-gradient(180deg, #f7f3ee 0%, #f3f0eb 100%);
+  color: #161616;
+}
+
+.header {
+  max-width: 980px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+
+.kicker {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  opacity: 0.65;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  max-width: 760px;
+  margin: 0 auto;
+  opacity: 0.75;
+  line-height: 1.6;
+}
+
+.layout {
+  max-width: 1180px;
+  margin: 40px auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 28px;
+}
+
+.card,
+.sideCard,
+.productCard {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.card {
+  padding: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.field span {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font: inherit;
+  background: #fff;
+  resize: vertical;
+}
+
+.field textarea {
+  min-height: 140px;
+}
+
+.button {
+  margin-top: 18px;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 22px;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.error,
+.success {
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+.error {
+  color: #a31621;
+}
+
+.success {
+  color: #0c6b3c;
+}
+
+.sidebar {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.sideCard {
+  padding: 22px;
+}
+
+.sideCard h3,
+.sectionTitle {
+  margin-bottom: 10px;
+}
+
+.sideCard p {
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.listSection {
+  max-width: 1180px;
+  margin: 34px auto 0;
+}
+
+.list {
+  display: grid;
+  gap: 14px;
+}
+
+.productCard {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+}
+
+.productCard h3 {
+  margin-bottom: 8px;
+}
+
+.productCard p,
+.meta {
+  opacity: 0.8;
+}
+
+.meta {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+  text-align: right;
+}
+
+.empty {
+  opacity: 0.7;
+  padding: 12px 0;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .productCard {
+    flex-direction: column;
+  }
+
+  .meta {
+    text-align: left;
+    min-width: 0;
+  }
+}
