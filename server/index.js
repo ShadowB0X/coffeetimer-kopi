@@ -1,6 +1,7 @@
 /* global process */
 
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import pg from "pg";
@@ -14,6 +15,18 @@ if (!process.env.DATABASE_URL) {
 }
 
 const app = express();
+app.use(cors({
+
+  origin: [
+    "http://localhost:5173",
+    "https://shadowbox.dk"
+  ],
+
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+
+  allowedHeaders: ["Content-Type"],
+
+}));
 app.use(express.json());
 
 const { Pool } = pg;

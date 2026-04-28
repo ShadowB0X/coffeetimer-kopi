@@ -4,59 +4,92 @@ import crypto from "crypto";
 const router = express.Router();
 
 export default function productRoutes(db) {
+
   function normalizeProduct(row) {
-  return {
-    product_id: row.product_id,
-    name: row.product_name,
-    price: Number(row.product_price),
-    stock_quantity: Number(row.stock_quantity),
-    created_at: row.created_at,
-  };
-}
+    return {
+      product_id: row.product_id,
+      name: row.product_name,
+      price: Number(row.product_price),
+      stock_quantity: Number(row.stock_quantity),
+      description: "", // ikke brugt længere
+      created_at: row.created_at,
+    };
+  }
 
-  async function createProductInDb({ product_name, product_price, stock_quantity = 0 }) {
-  const result = await db.query(
-    `INSERT INTO products (product_name, product_price, stock_quantity)
-     VALUES ($1,$2,$3) RETURNING *`,
-    [product_name, product_price, stock_quantity]
-  );
-  return result.rows[0];
-}
-
+  // GET alle produkter
   router.get("/", async (req, res) => {
     try {
-      const result = await db.query(`SELECT * FROM products ORDER BY created_at DESC`);
-      const products = result.rows.map(normalizeProduct);
-      res.json({ ok: true, products, produkter: products });
+      const result = await db.query(`
+        SELECT *
+        FROM products
+        ORDER BY created_at DESC
+      `);
+
+      res.json({
+        ok: true,
+        products: result.rows.map(normalizeProduct),
+      });
+
     } catch (err) {
-      res.status(500).json({ ok: false, error: String(err?.message || err) });
+      res.status(500).json({
+        ok: false,
+        error: String(err?.message || err),
+      });
     }
   });
 
-router.post("/", async (req, res) => {
-  try {
-    const { name, price, stock_quantity } = req.body || {};
+  // POST opret produkt
+  router.post("/", async (req, res) => {
+    try {
+      const { name, price, stock_quantity, stockQuantity } = req.body || {};
 
-    const renNavn = String(name || "").trim();
-    const numeriskPris = Number(price);
-    const numeriskAntal = Number(stock_quantity ?? 0);
+      const cleanName = String(name || "").trim();
+      const numericPrice = Number(price);
+      const numericStock = Number(stock_quantity ?? stockQuantity ?? 0);
 
-    if (!renNavn) return res.status(400).json({ ok: false, error: "Manglende felt: name" });
-    if (!Number.isFinite(numeriskPris) || numeriskPris < 0) return res.status(400).json({ ok: false, error: "Ugyldig pris" });
-    if (!Number.isInteger(numeriskAntal) || numeriskAntal < 0) return res.status(400).json({ ok: false, error: "Ugyldigt antal" });
+      if (!cleanName) {
+        return res.status(400).json({ ok: false, error: "Manglende navn" });
+      }
 
-    const row = await createProductInDb({
-      product_name: renNavn,
-      product_price: numeriskPris,
-      stock_quantity: numeriskAntal,
-    });
+      if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+        return res.status(400).json({ ok: false, error: "Ugyldig pris" });
+      }
 
-    const product = normalizeProduct(row);
-    res.status(201).json({ ok: true, product });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});
+      if (!Number.isInteger(numericStock) || numericStock < 0) {
+        return res.status(400).json({ ok: false, error: "Ugyldigt lagerantal" });
+      }
+
+      const result = await db.query(
+        `
+        INSERT INTO products (
+          product_id,
+          product_name,
+          product_price,
+          stock_quantity
+        )
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+        `,
+        [
+          crypto.randomUUID(),
+          cleanName,
+          numericPrice,
+          numericStock,
+        ]
+      );
+
+      res.status(201).json({
+        ok: true,
+        product: normalizeProduct(result.rows[0]),
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: String(err?.message || err),
+      });
+    }
+  });
 
   return router;
 }
