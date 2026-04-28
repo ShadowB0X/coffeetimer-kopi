@@ -50,8 +50,8 @@ export default function ProductPage({ isAdmin = false }) {
 
     try {
       setSaving(true);
-
-      const response = await fetch('/api/products', {
+      //const response = await fetch('https://shadowbox.dk/api/products');
+      const response = await fetch('https://shadowbox.dk/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

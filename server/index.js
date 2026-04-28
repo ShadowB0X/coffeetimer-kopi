@@ -7,9 +7,7 @@ import pg from "pg";
 import { sendTelegramMessage } from "./telegram.js";
 import productRoutes from "./products.js";
 
-dotenv.config({ path: ".env.local" });
-
-const { Pool } = pg;
+dotenv.config({ path: ".env.local"});
 
 if (!process.env.DATABASE_URL) {
   console.warn("DATABASE_URL is missing. Create a .env.local file in the project root with a valid PostgreSQL connection string.");
@@ -18,6 +16,7 @@ if (!process.env.DATABASE_URL) {
 const app = express();
 app.use(express.json());
 
+const { Pool } = pg;
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
