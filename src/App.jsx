@@ -50,7 +50,6 @@ function App() {
         <Route path="/" element={<MainPage />} />
 
         {/* Offentlig produktside */}
-        <Route path="/products" element={<ProductsPage />} />
         <Route path="/services" element={<ProductsPage />} />
 
         <Route path="/prices" element={<PricesPage />} />
