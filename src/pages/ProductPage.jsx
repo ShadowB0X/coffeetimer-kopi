@@ -169,18 +169,21 @@ export default function ProductPage({ isAdmin = false }) {
       <section className={styles.listSection}>
         <h2 className={styles.sectionTitle}>Produkter i databasen</h2>
         <div className={styles.list}>
-          {products.map((product) => (
-            <article className={styles.productCard} key={product.product_id}>
-              <div>
-                <h3>{product.name}</h3>
-                <p>{product.description || 'Ingen beskrivelse'}</p>
-              </div>
-              <div className={styles.meta}>
-                <span>Pris: {Number(product.price).toFixed(2)} kr</span>
-                <span>Lager: {product.stock_quantity}</span>
-              </div>
-            </article>
-          ))}
+        {products.map((product) => (
+  <article className={styles.productCard} key={product.product_id}>
+    <div>
+      <h3>{product.name || product.product_name}</h3>
+      <p>{product.description || 'Ingen beskrivelse'}</p>
+    </div>
+
+    <div className={styles.meta}>
+      <span>
+        Pris: {Number(product.price ?? product.product_price).toFixed(2)} kr
+      </span>
+      <span>Lager: {product.stock_quantity}</span>
+    </div>
+  </article>
+))}
 
           {!loading && products.length === 0 && (
             <p className={styles.empty}>Der er endnu ingen produkter oprettet.</p>
