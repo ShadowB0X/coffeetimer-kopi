@@ -6,12 +6,8 @@ import BookingPage from './pages/BookingPage.jsx';
 import MainPage from './pages/MainPage.jsx';
 import VisionPage from './pages/VisionPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
-import EndpointPage from './pages/EndPointPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import UploadPage from './pages/UploadPage.jsx';
-import FileListPage from './pages/FileListPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
 
