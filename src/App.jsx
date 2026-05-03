@@ -6,7 +6,6 @@ import PricesPage from './pages/PricesPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
 import MainPage from './pages/MainPage.jsx';
 import VisionPage from './pages/VisionPage.jsx';
-import EndpointPage from './pages/EndPointPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
