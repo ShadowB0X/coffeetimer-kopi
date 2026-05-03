@@ -53,11 +53,12 @@ function App() {
         <Route
           path="/products"
           element={
+            <ProtectedRoute token={adminToken}>
               <ProductPage isAdmin={Boolean(adminToken)} />
+            </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-  
+      
      
       </Routes>
     </>
