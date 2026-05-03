@@ -7,7 +7,6 @@ import MainPage from './pages/MainPage.jsx';
 import VisionPage from './pages/VisionPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
 
