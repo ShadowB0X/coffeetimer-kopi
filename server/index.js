@@ -8,25 +8,23 @@ import pg from "pg";
 import { sendTelegramMessage } from "./telegram.js";
 import productRoutes from "./products.js";
 
-dotenv.config({ path: ".env.local"});
+dotenv.config({ path: ".env.local" });
 
 if (!process.env.DATABASE_URL) {
   console.warn("DATABASE_URL is missing. Create a .env.local file in the project root with a valid PostgreSQL connection string.");
 }
 
 const app = express();
-app.use(cors({
 
+app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://shadowbox.dk"
   ],
-
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-
   allowedHeaders: ["Content-Type"],
-
 }));
+
 app.use(express.json());
 
 const { Pool } = pg;
@@ -108,8 +106,6 @@ async function getBookingsForDate({ barberId, date }) {
   return result.rows;
 }
 
-
-
 app.get("/api/health", async (req, res) => {
   try {
     await db.query("SELECT 1");
@@ -131,6 +127,7 @@ app.get("/api/notify-test", async (req, res) => {
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body || {};
+
     const cleanEmail = String(email || "").trim().toLowerCase();
     const cleanPassword = String(password || "");
 
@@ -150,53 +147,6 @@ app.post("/api/auth/login", async (req, res) => {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
-
-/*
-tror ikke denne bruges. fjernes?
-app.get("/api/products", async (req, res) => {
-  try {
-    const products = await getProductsFromDb();
-    res.json({ ok: true, products });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});*/
-
-/*
-samme her. product-funktionalitet flyttet over til "products.js"
-app.post("/api/products", async (req, res) => {
-  try {
-    const { name, price, stockQuantity, description } = req.body || {};
-
-    const cleanName = String(name || "").trim();
-    const numericPrice = Number(price);
-    const numericStockQuantity = Number(stockQuantity);
-    const cleanDescription = String(description || "").trim();
-
-    if (!cleanName) {
-      return res.status(400).json({ ok: false, error: "Missing field: name" });
-    }
-
-    if (!Number.isFinite(numericPrice) || numericPrice < 0) {
-      return res.status(400).json({ ok: false, error: "Invalid field: price must be a number >= 0" });
-    }
-
-    if (!Number.isInteger(numericStockQuantity) || numericStockQuantity < 0) {
-      return res.status(400).json({ ok: false, error: "Invalid field: stockQuantity must be an integer >= 0" });
-    }
-
-    const product = await createProductInDb({
-      name: cleanName,
-      price: numericPrice,
-      stockQuantity: numericStockQuantity,
-      description: cleanDescription,
-    });
-
-    res.status(201).json({ ok: true, product });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});*/
 
 app.get("/api/barbers", (req, res) => {
   res.json({ ok: true, barbers: BARBERS });
@@ -408,8 +358,6 @@ app.patch("/api/bookings/:bookingId/cancel", async (req, res) => {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
-
-
 
 const port = Number(process.env.SERVER_PORT || 5050);
 
