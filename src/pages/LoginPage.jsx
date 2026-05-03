@@ -19,7 +19,7 @@ export default function LoginPage({ onLogin }) {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
