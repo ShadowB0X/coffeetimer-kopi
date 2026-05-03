@@ -30,7 +30,7 @@ export default function LoginPage({ onLogin }) {
         const userEmail = data.user?.email || email;
         const isAdmin = data.user?.role === 'admin';
         onLogin(data.token, userEmail, isAdmin);
-        setRedirectTo(isAdmin ? '/products' : redirectPath);
+        setRedirectTo(isAdmin ? '/admin/products' : redirectPath);
       } else {
         const data = await res.json().catch(() => ({}));
         setMessage(data?.error || 'Login failed');
