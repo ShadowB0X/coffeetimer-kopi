@@ -8,7 +8,7 @@ import VisionPage from './pages/VisionPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import Navbar from './pages/Navbar.jsx';
-import IntroPage from './pages/IntroPage'; 
+import IntroPage from './pages/IntroPage';
 import ProductsPage from './pages/ProductsPage.jsx';
 
 function App() {
@@ -19,8 +19,10 @@ function App() {
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedAdminToken = localStorage.getItem('adminToken');
+
     if (storedToken) setToken(storedToken);
     if (storedAdminToken) setAdminToken(storedAdminToken);
+
     setIsLoading(false);
   }, []);
 
@@ -43,26 +45,28 @@ function App() {
   return (
     <>
       <Navbar />
+
       <Routes>
         <Route path="/" element={<MainPage />} />
+
+        {/* Offentlig produktside */}
+        <Route path="/products" element={<ProductsPage />} />
         <Route path="/services" element={<ProductsPage />} />
+
         <Route path="/prices" element={<PricesPage />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/intro" element={<IntroPage />} /> 
+        <Route path="/intro" element={<IntroPage />} />
         <Route path="/vision" element={<VisionPage />} />
-        <Route path="/login" element={<ProductPage/>} />
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute token={adminToken}>
-              <ProductPage isAdmin={Boolean(adminToken)} />
-            </ProtectedRoute>
-          }
-        />
 
+        {/* Login */}
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/auth/login" element={<LoginPage onLogin={handleLogin} />} />
-  
-     
+
+        {/* Admin produkt-side */}
+        <Route
+          path="/admin/products"
+          element={<ProductPage isAdmin={Boolean(adminToken)} />}
+        />
       </Routes>
     </>
   );
