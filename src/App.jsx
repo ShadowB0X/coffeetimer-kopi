@@ -9,6 +9,7 @@ import ProductPage from './pages/ProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
+import ProductsPage from './pages/ProductsPage.jsx';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -44,7 +45,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services" element={<ProductsPage />} />
         <Route path="/prices" element={<PricesPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
