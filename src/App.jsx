@@ -6,6 +6,7 @@ import PricesPage from './pages/PricesPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
 import MainPage from './pages/MainPage.jsx';
 import VisionPage from './pages/VisionPage.jsx';
+import EndpointPage from './pages/EndPointPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import Navbar from './pages/Navbar.jsx';
 import IntroPage from './pages/IntroPage'; 
@@ -13,25 +14,30 @@ import ProductsPage from './pages/ProductsPage.jsx';
 
 function App() {
   const [token, setToken] = useState(null);
-  const [username, setUsername] = useState(null);
+  const [adminToken, setAdminToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
+    const storedAdminToken = localStorage.getItem('adminToken');
     if (storedToken) setToken(storedToken);
-    if (storedUsername) setUsername(storedUsername);
+    if (storedAdminToken) setAdminToken(storedAdminToken);
     setIsLoading(false);
   }, []);
 
-  const handleLogin = (newToken, userEmail) => {
+  const handleLogin = (newToken, userEmail, isAdmin = false) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('username', userEmail);
     setToken(newToken);
     setUsername(userEmail);
   };
 
-  
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setToken(null);
+    setUsername(null);
+  };
 
   if (isLoading) return null;
 
@@ -45,10 +51,25 @@ function App() {
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/vision" element={<VisionPage />} />
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} 
+        <Route path="/endpoints" element={<EndpointPage />} />
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute token={token}>
+              <UploadPage token={token} />
+            </ProtectedRoute>
+          }
         />
-      
-        
+        <Route
+          path="/filelist"
+          element={
+            <ProtectedRoute token={token}>
+              <FileListPage token={token} />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
