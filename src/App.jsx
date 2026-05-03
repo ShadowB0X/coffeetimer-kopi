@@ -53,30 +53,12 @@ function App() {
         <Route
           path="/products"
           element={
-            <ProtectedRoute token={adminToken}>
               <ProductPage isAdmin={Boolean(adminToken)} />
-            </ProtectedRoute>
           }
         />
-        <Route path="/endpoints" element={<EndpointPage />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute token={token}>
-              <UploadPage token={token} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/filelist"
-          element={
-            <ProtectedRoute token={token}>
-              <FileListPage token={token} />
-            </ProtectedRoute>
-          }
-        />
+  
+     
       </Routes>
     </>
   );
