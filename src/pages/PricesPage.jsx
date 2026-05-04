@@ -54,7 +54,7 @@ export default function PricesPage() {
               Prisen afhænger af længde og ønsket form. Vi aftaler altid før vi starter.
             </p>
 
-            <a className={styles.primaryBtn} href="/book">
+            <a className={styles.primaryBtn} href="/booking">
               Book tid
             </a>
 

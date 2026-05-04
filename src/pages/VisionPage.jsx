@@ -60,7 +60,7 @@ export default function VisionPage() {
               </div>
             </div>
 
-            <a className={styles.primaryBtn} href="/book">
+            <a className={styles.primaryBtn} href="/booking">
               Book tid
             </a>
 
