@@ -14,7 +14,7 @@ export default function ProductPage({ isAdmin = false }) {
   const [price, setPrice] = useState('');
   const [stockQuantity, setStockQuantity] = useState('');
 
-  async function loadProducts() {
+  async function loadProductsForAdmin() {
     try {
       setLoading(true);
       setError('');
@@ -34,8 +34,20 @@ export default function ProductPage({ isAdmin = false }) {
     }
   }
 
+  async function loadProductsForCustomers() {
+    try {
+      if (isAdmin) {
+        loadProductsForAdmin();
+      } else {
+        loadProductsForCustomers
+      }
+    } catch (err) {
+      setError(String(err?.message || err));
+    }
+  };
+
   useEffect(() => {
-    loadProducts();
+    loadProductsForAdmin();
   }, []);
 
   async function handleSubmit(e) {
@@ -71,7 +83,7 @@ export default function ProductPage({ isAdmin = false }) {
       setName('');
       setPrice('');
       setStockQuantity('');
-      await loadProducts();
+      await loadProductsForAdmin();
     } catch (err) {
       setError(String(err?.message || err));
     } finally {
@@ -100,7 +112,7 @@ export default function ProductPage({ isAdmin = false }) {
       }
 
       setSuccess('✅ Produktet er slettet.');
-      await loadProducts();
+      await loadProductsForAdmin();
     } catch (err) {
       setError(String(err?.message || err));
     } finally {
