@@ -22,7 +22,7 @@ export default function MainPage() {
         {/* 🔥 USYNLIGE KLIK ZONER */}
         <div className={styles.heroHotspots}>
           <a href="/booking" className={styles.hotspotBook}></a>
-          <a href="/services" className={styles.hotspotProducts}></a>
+          <a href="/produkter" className={styles.hotspotProducts}></a>
         </div>
 
       </header>
