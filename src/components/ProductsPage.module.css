@@ -3,11 +3,9 @@
     color:#f5f5f3;
     font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
   
-    /* ❌ FJERNET background herfra */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: scroll;
   
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
@@ -15,14 +13,16 @@
     position: relative;
   }
   
-  /* 🔥 BEHOLD overlay */
+  /* ✅ IKKE fixed længere */
   .page::before{
     content:"";
-    position:fixed;
+    position:absolute;   /* 🔥 FIX */
     inset:0;
+  
     background:
       linear-gradient(90deg, rgba(0,0,0,.75), rgba(0,0,0,.4), rgba(0,0,0,.75)),
       radial-gradient(circle at center, rgba(0,0,0,.2), rgba(0,0,0,.85));
+  
     pointer-events:none;
     z-index:0;
   }
