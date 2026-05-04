@@ -5,7 +5,7 @@ const router = express.Router();
 
 export default function productRoutes(db) {
 
-  function normalizeProduct(row) {
+  function showProductsToAdmin(row) {
     return {
       product_id: row.product_id,
       name: row.product_name,
@@ -16,8 +16,39 @@ export default function productRoutes(db) {
     };
   }
 
-  // GET alle produkter
-  router.get("/", async (req, res) => {
+  function showProductQuantityAndPriceToCustomers(row) {
+    return {
+      product_id: row.product_id,
+      name: row.product_name,
+      price: row.product_price,
+      quantity: row.stock_quantity
+    };
+  }
+
+  // se pris/lagerstatus på produkter som kunde 
+  router.get("/customers/product-information", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT product_id, product_name, product_price, stock_quantity 
+      FROM products
+      ORDER BY created_at DESC
+    `);
+
+    res.json({
+      ok: true,
+      products: result.rows.map(showProductQuantityAndPriceToCustomers),
+    })
+
+  } catch (err) {
+    res.status(500).json({
+      ok: false,
+      error: String(err?.message || err),
+    });
+      }
+});
+
+  // GET alle produkter til admin interface
+  router.get("/admin/product-information", async (req, res) => {
     try {
       const result = await db.query(`
         SELECT *
@@ -27,7 +58,7 @@ export default function productRoutes(db) {
 
       res.json({
         ok: true,
-        products: result.rows.map(normalizeProduct),
+        products: result.rows.map(showProductsToAdmin),
       });
 
     } catch (err) {
@@ -80,7 +111,7 @@ export default function productRoutes(db) {
 
       res.status(201).json({
         ok: true,
-        product: normalizeProduct(result.rows[0]),
+        product: showProductsToAdmin(result.rows[0]),
       });
 
     } catch (err) {
