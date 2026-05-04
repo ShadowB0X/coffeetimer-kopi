@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "../components/BookingPage.module.css";
+import bookingBg from "../assets/booking-bg.jpeg";
 
 const todayISODate = () => {
   const d = new Date();
@@ -164,7 +165,10 @@ export default function BookingPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div
+  className={styles.page}
+  style={{ backgroundImage: `url(${bookingBg})` }}
+>
       <section className={styles.phoneShell}>
         <header className={styles.topBar}>
           <span className={styles.backCircle}>‹</span>

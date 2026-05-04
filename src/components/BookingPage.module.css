@@ -1,12 +1,29 @@
 .page{
   min-height:100vh;
   padding:110px 18px 70px;
-  background:
-    radial-gradient(circle at top right, rgba(47,240,168,.13), transparent 34%),
-    radial-gradient(circle at top left, rgba(255,255,255,.06), transparent 28%),
-    linear-gradient(135deg, #050505 0%, #0b0707 45%, #000 100%);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
   color:#f8f4ee;
   font-family:ui-serif, Georgia, "Times New Roman", Times, serif;
+  position:relative;
+}
+
+.page::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.35), rgba(0,0,0,.72)),
+    radial-gradient(circle at center, rgba(0,0,0,.15), rgba(0,0,0,.75));
+  pointer-events:none;
+  z-index:0;
+}
+
+.phoneShell{
+  position:relative;
+  z-index:1;
 }
 
 .phoneShell{
