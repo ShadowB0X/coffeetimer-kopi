@@ -33,7 +33,6 @@ const db = new Pool({
 });
 
 app.use("/api/products", productRoutes(db));
-
 app.delete("/api/products/:productId", async (req, res) => {
   try {
     const { productId } = req.params;
