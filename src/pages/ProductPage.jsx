@@ -34,17 +34,12 @@ export default function ProductPage({ isAdmin = false }) {
     }
   }
 
+  // Kunder henter kun det de må se
   async function loadProductsForCustomers() {
-    try {
-      if (isAdmin) {
-        loadProductsForAdmin();
-      } else {
-        loadProductsForCustomers
-      }
-    } catch (err) {
-      setError(String(err?.message || err));
-    }
-  };
+  const response = await fetch('/api/products/customers/product-information');
+  const data = await response.json();
+  setProducts(data.products || []);
+}
 
   useEffect(() => {
     loadProductsForAdmin();
