@@ -50,12 +50,11 @@ function App() {
         <Route path="/" element={<MainPage />} />
 
         {/* Offentlig produktside */}
-        <Route path="/services" element={<ProductsPage />} />
-
+        <Route path="/produkter" element={<ProductsPage />} />
         <Route path="/prices" element={<PricesPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/intro" element={<IntroPage />} />
-        <Route path="/vision" element={<VisionPage />} />
+        <Route path="/kontakt" element={<VisionPage />} />
 
         {/* Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
