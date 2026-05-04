@@ -34,6 +34,38 @@ const db = new Pool({
 
 app.use("/api/products", productRoutes(db));
 
+app.delete("/api/products/:productId", async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const result = await db.query(
+      `
+      DELETE FROM products
+      WHERE product_id = $1
+      RETURNING *
+      `,
+      [productId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Produkt ikke fundet",
+      });
+    }
+
+    res.json({
+      ok: true,
+      deletedProduct: result.rows[0],
+    });
+  } catch (err) {
+    res.status(500).json({
+      ok: false,
+      error: String(err?.message || err),
+    });
+  }
+});
+
 const ADMIN_USER = {
   email: "admin@coffeetimer.local",
   password: "admin123",

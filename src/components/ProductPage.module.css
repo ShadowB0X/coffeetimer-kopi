@@ -193,5 +193,25 @@
   .meta {
     text-align: left;
     min-width: 0;
+    
+  }
+
+  .deleteButton{
+    border:0;
+    background:#7a1f1f;
+    color:white;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  
+  .deleteButton:hover{
+    background:#9b2626;
+  }
+  
+  .deleteButton:disabled{
+    opacity:.6;
+    cursor:not-allowed;
   }
 }

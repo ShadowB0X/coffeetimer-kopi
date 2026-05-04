@@ -6,13 +6,13 @@ export default function ProductPage({ isAdmin = false }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stockQuantity, setStockQuantity] = useState('');
-  const [description, setDescription] = useState('');
 
   async function loadProducts() {
     try {
@@ -50,7 +50,7 @@ export default function ProductPage({ isAdmin = false }) {
 
     try {
       setSaving(true);
-      //const response = await fetch('https://shadowbox.dk/api/products');
+
       const response = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,7 +58,6 @@ export default function ProductPage({ isAdmin = false }) {
           name: name.trim(),
           price: Number(price),
           stock_quantity: Number(stockQuantity),
-          description: description.trim(),
         }),
       });
 
@@ -68,16 +67,44 @@ export default function ProductPage({ isAdmin = false }) {
         throw new Error(data?.error || 'Produkt kunne ikke oprettes');
       }
 
-      setSuccess('✅ Produktet er oprettet og gemt i databasen.');
+      setSuccess('✅ Produktet er oprettet.');
       setName('');
       setPrice('');
       setStockQuantity('');
-      setDescription('');
       await loadProducts();
     } catch (err) {
       setError(String(err?.message || err));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDelete(productId) {
+    const confirmDelete = window.confirm('Er du sikker på, at du vil slette dette produkt?');
+
+    if (!confirmDelete) return;
+
+    try {
+      setError('');
+      setSuccess('');
+      setDeletingId(productId);
+
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data?.error || 'Produktet kunne ikke slettes');
+      }
+
+      setSuccess('✅ Produktet er slettet.');
+      await loadProducts();
+    } catch (err) {
+      setError(String(err?.message || err));
+    } finally {
+      setDeletingId('');
     }
   }
 
@@ -87,7 +114,7 @@ export default function ProductPage({ isAdmin = false }) {
         <p className={styles.kicker}>ADMIN · PRODUKTER</p>
         <h1 className={styles.title}>Opret nyt produkt</h1>
         <p className={styles.subtitle}>
-          Udfyld navn, pris, lagerantal og beskrivelse for at registrere produktet i databasen.
+          Opret og administrer produkter i databasen.
         </p>
       </header>
 
@@ -128,16 +155,6 @@ export default function ProductPage({ isAdmin = false }) {
                   placeholder="fx 12"
                 />
               </label>
-
-              <label className={`${styles.field} ${styles.fullWidth}`}>
-                <span>Beskrivelse</span>
-                <textarea
-                  rows="5"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Kort beskrivelse af produktet"
-                />
-              </label>
             </div>
 
             <button className={styles.button} type="submit" disabled={saving}>
@@ -156,10 +173,6 @@ export default function ProductPage({ isAdmin = false }) {
 
         <aside className={styles.sidebar}>
           <div className={styles.sideCard}>
-            <h3>Formål</h3>
-            <p>Bruges af administrator til at oprette produkter, som gemmes i databasen og vises på hjemmesiden.</p>
-          </div>
-          <div className={styles.sideCard}>
             <h3>Registrerede produkter</h3>
             <p>{loading ? 'Henter produkter...' : `${products.length} produkter fundet`}</p>
           </div>
@@ -168,22 +181,36 @@ export default function ProductPage({ isAdmin = false }) {
 
       <section className={styles.listSection}>
         <h2 className={styles.sectionTitle}>Produkter i databasen</h2>
-        <div className={styles.list}>
-        {products.map((product) => (
-  <article className={styles.productCard} key={product.product_id}>
-    <div>
-      <h3>{product.name || product.product_name}</h3>
-      <p>{product.description || 'Ingen beskrivelse'}</p>
-    </div>
 
-    <div className={styles.meta}>
-      <span>
-        Pris: {Number(product.price ?? product.product_price).toFixed(2)} kr
-      </span>
-      <span>Lager: {product.stock_quantity}</span>
-    </div>
-  </article>
-))}
+        <div className={styles.list}>
+          {products.map((product) => {
+            const productName = product.name || product.product_name;
+            const productPrice = product.price ?? product.product_price;
+
+            return (
+              <article className={styles.productCard} key={product.product_id}>
+                <div>
+                  <h3>{productName}</h3>
+                </div>
+
+                <div className={styles.meta}>
+                  <span>Pris: {Number(productPrice).toFixed(2)} kr</span>
+                  <span>Lager: {product.stock_quantity}</span>
+
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      className={styles.deleteButton}
+                      onClick={() => handleDelete(product.product_id)}
+                      disabled={deletingId === product.product_id}
+                    >
+                      {deletingId === product.product_id ? 'Sletter...' : 'Slet'}
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
 
           {!loading && products.length === 0 && (
             <p className={styles.empty}>Der er endnu ingen produkter oprettet.</p>
