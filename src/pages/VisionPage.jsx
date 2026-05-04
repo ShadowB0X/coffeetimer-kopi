@@ -1,8 +1,12 @@
 import styles from "../components/VisionPage.module.css";
+import bg from "../assets/booking-bg.jpeg";
 
 export default function VisionPage() {
   return (
-    <div className={styles.page}>
+    <div
+    className={styles.page}
+    style={{ backgroundImage: `url(${bg})` }}
+  >
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <p className={styles.kicker}>ShortCut · Gammel Kongevej 91C</p>
