@@ -46,9 +46,7 @@ export default function ProductsPage() {
   return (
     <div
     className={styles.page}
-    style={{ backgroundImage: `url(${bg})` }}
-  >
-    
+    style={{ backgroundImage: `url(${bg})` }}>
       <h1 className={styles.title}>Produkter</h1>
       <p className={styles.subtitle}>Premium barber products used in our shop</p>
 
