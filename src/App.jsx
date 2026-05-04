@@ -67,6 +67,7 @@ function App() {
           element={<ProductPage isAdmin={Boolean(adminToken)} />}
         />
       </Routes>
+      
     </>
   );
 }

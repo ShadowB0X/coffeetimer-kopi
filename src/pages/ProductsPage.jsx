@@ -8,7 +8,10 @@ import powderwax from "../assets/powderwax.jpg"
 import waxstack from "../assets/waxstack.jpg"
 
 export default function ProductsPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  // skal de rykkes uden for funktionen??
   const products = [
     {
       name: "Totex Barber Cologne No.2",
@@ -41,6 +44,33 @@ export default function ProductsPage() {
       image: waxstack
     }
   ]
+
+  async function loadProductsForCustomers() {
+    try {
+        setLoading(true);
+        const resp = await fetch("/api/products");
+        const data = await response.json();
+
+        const combined = hardcodedProducts.map((hardcoded) => {
+          const fromDb = data.products.find((p) => p.name === hardcoded.name);
+          return {
+            ...hardcoded,
+            price: fromDb?.price ?? "-",
+            stock_quantity: fromDb?.stock_quantity ?? 0,
+          };
+
+          setProducts(combined);
+        });
+
+
+    } catch (err) {
+      setError(String(err?.message || err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  
 
   return (
     <div className={styles.page}>
