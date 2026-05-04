@@ -1,4 +1,4 @@
-import styles from "../components/ProductPage.module.css"
+import styles from "../components/ProductsPage.module.css"
 
 import cologne2 from "../assets/cologne2.jpg"
 import cologne5 from "../assets/cologne5.jpg"
