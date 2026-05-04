@@ -6,42 +6,41 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-  
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    background-attachment: fixed;
   
     position: relative;
   }
   
-  /* ✅ IKKE fixed længere */
+  /* 🔥 DARK OVERLAY (samme som dine andre pages) */
   .page::before{
     content:"";
-    position:absolute;   /* 🔥 FIX */
+    position:fixed;
     inset:0;
-  
     background:
       linear-gradient(90deg, rgba(0,0,0,.75), rgba(0,0,0,.4), rgba(0,0,0,.75)),
       radial-gradient(circle at center, rgba(0,0,0,.2), rgba(0,0,0,.85));
-  
     pointer-events:none;
     z-index:0;
   }
   
-  /* HEADER */
-  .title{
+  /* 🔥 WRAPPER (fixer white gap + spacing) */
+  .inner{
     position:relative;
     z-index:1;
   
+    padding:120px 18px 70px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  
+  /* HEADER */
+  .title{
     text-align:center;
     font-size:clamp(2.2rem,4vw,3rem);
-    margin-top:60px;
-    margin-bottom:8px;
+    margin:0 0 8px;
   }
   
   .subtitle{
-    position:relative;
-    z-index:1;
-  
     text-align:center;
     opacity:.75;
     margin-bottom:30px;
@@ -49,12 +48,6 @@
   
   /* GRID */
   .grid{
-    position:relative;
-    z-index:1;
-  
-    max-width:1100px;
-    margin:0 auto;
-  
     display:grid;
     grid-template-columns:repeat(3, minmax(0,1fr));
     gap:22px;
@@ -98,6 +91,7 @@
     margin-bottom:6px;
   }
   
+  /* PRICE */
   .price{
     font-weight:700;
     color:#00c896;
