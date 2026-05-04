@@ -329,22 +329,29 @@
 /* FIX BUTTON ISSUE */
 
 .submit{
-
   width:auto;
-
   min-width:180px;
-
   justify-self:end;
 
-  background:#fff;
-
-  color:#111;
+  background: linear-gradient(135deg, #00c896, #00a67d);
+  color:#02110d;
 
   border:none;
+  border-radius:14px;
+  padding:12px 18px;
 
+  font-weight:600;
+  letter-spacing:0.02em;
+  cursor:pointer;
+
+  box-shadow: 0 10px 25px rgba(0,200,150,0.25);
+  transition: all 0.2s ease;
 }
 
-/* Responsive */
+.submit:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0,200,150,0.35);
+}
 
 @media(max-width:900px){
 
