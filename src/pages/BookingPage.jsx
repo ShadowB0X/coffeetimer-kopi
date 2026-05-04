@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "../components/BookingPage.module.css";
 
 const todayISODate = () => {
@@ -9,11 +9,27 @@ const todayISODate = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+const toISODate = (date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const formatTime = (iso) =>
   new Date(iso).toLocaleTimeString("da-DK", {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+const getDateLabel = (dateString) => {
+  const d = new Date(`${dateString}T12:00:00`);
+  return d.toLocaleDateString("da-DK", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  });
+};
 
 export default function BookingPage() {
   const [barbers, setBarbers] = useState([]);
@@ -32,6 +48,17 @@ export default function BookingPage() {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+
+  const nextDays = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      return toISODate(d);
+    });
+  }, []);
+
+  const selectedBarber = barbers.find((b) => b.id === barberId);
+  const selectedService = services.find((s) => s.id === serviceId);
 
   useEffect(() => {
     (async () => {
@@ -53,13 +80,8 @@ export default function BookingPage() {
         setBarbers(b.barbers || []);
         setServices(s.services || []);
 
-        if ((b.barbers || []).length > 0) {
-          setBarberId(b.barbers[0].id);
-        }
-
-        if ((s.services || []).length > 0) {
-          setServiceId(s.services[0].id);
-        }
+        if ((b.barbers || []).length > 0) setBarberId(b.barbers[0].id);
+        if ((s.services || []).length > 0) setServiceId(s.services[0].id);
       } catch (e) {
         setErr(String(e?.message || e));
       } finally {
@@ -82,7 +104,10 @@ export default function BookingPage() {
 
         if (!data?.ok) throw new Error(data?.error || "Kunne ikke hente tider");
 
-        setSlots(data.slots || []);
+        const now = new Date();
+        const validSlots = (data.slots || []).filter((iso) => new Date(iso) > now);
+
+        setSlots(validSlots);
       } catch (e) {
         setSlots([]);
         setErr(String(e?.message || e));
@@ -124,15 +149,15 @@ export default function BookingPage() {
       setMsg("✅ Booking oprettet! Vi har modtaget din booking.");
       setName("");
       setPhone("");
+      setSlot("");
 
       const r2 = await fetch(`/api/availability?date=${date}&barberId=${barberId}`);
       const d2 = await r2.json();
 
       if (d2?.ok) {
-        setSlots(d2.slots || []);
+        const now = new Date();
+        setSlots((d2.slots || []).filter((iso) => new Date(iso) > now));
       }
-
-      setSlot("");
     } catch (e) {
       setErr(String(e?.message || e));
     }
@@ -140,128 +165,156 @@ export default function BookingPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <p className={styles.kicker}>SHORTCUT · GAMMEL KONGEVEJ 91C</p>
-        <h1 className={styles.title}>Book en tid</h1>
-        <p className={styles.sub}>Vælg frisør, service og tid.</p>
-      </header>
+      <section className={styles.phoneShell}>
+        <header className={styles.topBar}>
+          <span className={styles.backCircle}>‹</span>
+          <h1>Book Now</h1>
+        </header>
 
-      <div className={styles.shell}>
-        <form className={styles.card} onSubmit={submit} noValidate>
-          <div className={styles.grid}>
-            <label className={styles.field}>
-              <span>Frisør</span>
-              <select
-                value={barberId}
-                onChange={(e) => setBarberId(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">
-                  {loading ? "Henter..." : "Vælg frisør"}
-                </option>
-                {barbers.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <section className={styles.barberCard}>
+          <div className={styles.avatar}>
+            {selectedBarber?.name?.charAt(0) || "S"}
+          </div>
+          <div>
+            <h2>{selectedBarber?.name || "ShortCut"}</h2>
+            <p>📍 Gammel Kongevej 91C</p>
+          </div>
+        </section>
 
-            <label className={styles.field}>
-              <span>Service</span>
-              <select
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">
-                  {loading ? "Henter..." : "Vælg service"}
-                </option>
-                {services.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} · {s.price} kr
-                  </option>
-                ))}
-              </select>
-            </label>
+        <form onSubmit={submit} noValidate>
+          <section className={styles.sectionBlock}>
+            <div className={styles.sectionHeader}>
+              <h3>Vælg frisør</h3>
+            </div>
 
-            <label className={styles.field}>
-              <span>Dato</span>
+            <div className={styles.choiceGrid}>
+              {barbers.map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  className={`${styles.choiceBtn} ${barberId === b.id ? styles.active : ""}`}
+                  onClick={() => setBarberId(b.id)}
+                  disabled={loading}
+                >
+                  {b.name}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className={styles.sectionBlock}>
+            <div className={styles.sectionHeader}>
+              <h3>Vælg service</h3>
+            </div>
+
+            <div className={styles.serviceGrid}>
+              {services.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`${styles.serviceBtn} ${serviceId === s.id ? styles.active : ""}`}
+                  onClick={() => setServiceId(s.id)}
+                  disabled={loading}
+                >
+                  <span>{s.name}</span>
+                  <strong>{s.price} kr</strong>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className={styles.sectionBlock}>
+            <div className={styles.sectionHeader}>
+              <h3>Vælg dato</h3>
               <input
+                className={styles.hiddenDate}
                 type="date"
+                min={todayISODate()}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
-            </label>
+            </div>
 
-            <label className={styles.field}>
-              <span>Tid</span>
-              <select
-                value={slot}
-                onChange={(e) => setSlot(e.target.value)}
-                disabled={loadingSlots || !barberId}
-              >
-                <option value="">
-                  {loadingSlots ? "Henter tider..." : "Vælg tid"}
-                </option>
+            <div className={styles.dateRow}>
+              {nextDays.map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  className={`${styles.dateBtn} ${date === day ? styles.active : ""}`}
+                  onClick={() => setDate(day)}
+                >
+                  {getDateLabel(day)}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className={styles.sectionBlock}>
+            <div className={styles.sectionHeader}>
+              <h3>Ledige tider</h3>
+            </div>
+
+            {loadingSlots ? (
+              <p className={styles.muted}>Henter tider...</p>
+            ) : slots.length === 0 ? (
+              <p className={styles.muted}>Ingen ledige tider på denne dag.</p>
+            ) : (
+              <div className={styles.slotGrid}>
                 {slots.map((iso) => (
-                  <option key={iso} value={iso}>
+                  <button
+                    key={iso}
+                    type="button"
+                    className={`${styles.slotBtn} ${slot === iso ? styles.active : ""}`}
+                    onClick={() => setSlot(iso)}
+                  >
                     {formatTime(iso)}
-                  </option>
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            )}
+          </section>
 
-            <label className={styles.field}>
-              <span>Navn</span>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Dit navn"
-                autoComplete="name"
-              />
-            </label>
+          <section className={styles.sectionBlock}>
+            <div className={styles.inputGrid}>
+              <label className={styles.field}>
+                <span>Navn</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Dit navn"
+                  autoComplete="name"
+                />
+              </label>
 
-            <label className={styles.field}>
-              <span>Telefon (valgfrit)</span>
-              <input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="fx 12 34 56 78"
-                autoComplete="tel"
-                inputMode="tel"
-              />
-            </label>
-          </div>
+              <label className={styles.field}>
+                <span>Telefon</span>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="12 34 56 78"
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
+              </label>
+            </div>
+          </section>
 
-          <button className={styles.button} type="submit">
-            Book tid
+          {err && <p className={styles.error}>{err}</p>}
+          {msg && <p className={styles.success}>{msg}</p>}
+
+          <button className={styles.confirmBar} type="submit">
+            <span>›</span>
+            <strong>
+              {selectedService
+                ? `Book ${selectedService.name} · ${selectedService.price} kr`
+                : "Book tid"}
+            </strong>
+            <em>{slot ? formatTime(slot) : "Vælg tid"}</em>
           </button>
-
-          {err && (
-            <p className={styles.msg} style={{ color: "#8b0000" }}>
-              {err}
-            </p>
-          )}
-
-          {msg && <p className={styles.msg}>{msg}</p>}
         </form>
-
-        <aside className={styles.side}>
-          <div className={styles.sideCard}>
-            <h3>Information</h3>
-            <p>Vælg frisør, ønsket service og et ledigt tidspunkt.</p>
-          </div>
-
-          <div className={styles.sideCard}>
-            <h3>Adresse</h3>
-            <p>Gammel Kongevej 91C</p>
-            <p>1850 Frederiksberg</p>
-          </div>
-        </aside>
-      </div>
+      </section>
     </div>
   );
 }
