@@ -89,15 +89,33 @@
   min-height: 140px;
 }
 
+/* 🔥 FIXET KNAP */
 .button {
-  margin-top: 18px;
+  margin-top: 16px;
+
+  width: auto;              /* ikke full width */
+  min-width: 140px;
+
   border: none;
   border-radius: 999px;
-  padding: 14px 22px;
+
+  padding: 10px 22px;       /* mindre */
+  font-size: 0.95rem;
+
   background: #111;
   color: #fff;
   font-weight: 700;
+
   cursor: pointer;
+
+  display: block;           /* centrer */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .button:disabled {
@@ -193,7 +211,6 @@
   .meta {
     text-align: left;
     min-width: 0;
-    
   }
 
   .deleteButton{
