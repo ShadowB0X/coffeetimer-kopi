@@ -179,6 +179,118 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+app.post("/api/guest-session", async (req, res) => {
+  try {
+    const sessionId = crypto.randomUUID();
+    const token = crypto.randomUUID();
+
+    await db.query(
+      `
+      INSERT INTO guest_sessions (session_id, token)
+      VALUES ($1, $2)
+      `,
+      [sessionId, token]
+    );
+
+    // opret også cart med det samme
+    const cartId = crypto.randomUUID();
+
+    await db.query(
+      `
+      INSERT INTO carts (cart_id, session_id)
+      VALUES ($1, $2)
+      `,
+      [cartId, sessionId]
+    );
+
+    res.json({
+      ok: true,
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post("/api/cart/items", async (req, res) => {
+  try {
+    const token = req.headers["x-guest-token"];
+    const { productId, quantity } = req.body;
+
+    if (!token) {
+      return res.status(401).json({ ok: false, error: "Missing token" });
+    }
+
+    // find session
+    const sessionResult = await db.query(
+      `SELECT session_id FROM guest_sessions WHERE token = $1`,
+      [token]
+    );
+
+    if (sessionResult.rows.length === 0) {
+      return res.status(401).json({ ok: false, error: "Invalid session" });
+    }
+
+    const sessionId = sessionResult.rows[0].session_id;
+
+    // find cart
+    const cartResult = await db.query(
+      `SELECT cart_id FROM carts WHERE session_id = $1`,
+      [sessionId]
+    );
+
+    const cartId = cartResult.rows[0].cart_id;
+
+    // indsæt item
+    await db.query(
+      `
+      INSERT INTO cart_items (cart_item_id, cart_id, product_id, quantity)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [crypto.randomUUID(), cartId, productId, quantity || 1]
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+app.get("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers["x-guest-token"];
+
+    if (!token) {
+      return res.status(401).json({ ok: false, error: "Missing token" });
+    }
+
+    const result = await db.query(
+      `
+      SELECT
+        ci.cart_item_id,
+        ci.quantity,
+        p.product_id,
+        p.product_name,
+        p.product_price,
+        p.stock_quantity
+      FROM guest_sessions gs
+      JOIN carts c ON c.session_id = gs.session_id
+      JOIN cart_items ci ON ci.cart_id = c.cart_id
+      JOIN products p ON p.product_id = ci.product_id
+      WHERE gs.token = $1
+      ORDER BY ci.created_at DESC
+      `,
+      [token]
+    );
+
+    res.json({
+      ok: true,
+      items: result.rows,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
+});
+
 app.get("/api/barbers", (req, res) => {
   res.json({ ok: true, barbers: BARBERS });
 });

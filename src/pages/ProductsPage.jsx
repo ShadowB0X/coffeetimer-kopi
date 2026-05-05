@@ -13,8 +13,8 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
 
-  // 🔥 Map DB names → billeder
   const imageMap = {
     "Hair Wax": waxstack,
     "Beard Oil": beardoil,
@@ -52,6 +52,57 @@ export default function ProductsPage() {
     loadProducts();
   }, []);
 
+  useEffect(() => {
+    async function initSession() {
+      let token = localStorage.getItem("guestToken");
+
+      if (!token) {
+        const res = await fetch("/api/guest-session", {
+          method: "POST",
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          localStorage.setItem("guestToken", data.token);
+        }
+      }
+    }
+
+    initSession();
+  }, []);
+
+  // 🔥 STEP 4 FUNCTION
+  async function handleAddToCart(productId) {
+    try {
+      setMsg("");
+
+      const token = localStorage.getItem("guestToken");
+
+      const res = await fetch("/api/cart/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-guest-token": token,
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || "Kunne ikke tilføje til kurv");
+      }
+
+      setMsg("✅ Tilføjet til kurv");
+    } catch (err) {
+      setMsg("❌ Fejl: " + (err?.message || err));
+    }
+  }
+
   return (
     <div
       className={styles.page}
@@ -65,6 +116,7 @@ export default function ProductsPage() {
 
         {loading && <p>Henter produkter...</p>}
         {error && <p>{error}</p>}
+        {msg && <p style={{ textAlign: "center" }}>{msg}</p>}
 
         <div className={styles.grid}>
           {products.map((product) => {
@@ -89,6 +141,14 @@ export default function ProductsPage() {
                   <p className={styles.stock}>
                     Lager: {quantity}
                   </p>
+
+                  {/* 🔥 BUTTON */}
+                  <button
+                    className={styles.addButton}
+                    onClick={() => handleAddToCart(product.product_id)}
+                  >
+                    Tilføj til kurv
+                  </button>
                 </div>
               </div>
             );
