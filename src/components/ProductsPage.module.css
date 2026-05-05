@@ -114,3 +114,8 @@
     height:200px;
   }
 }
+.stock{
+    font-size:0.8rem;
+    opacity:.7;
+    margin-top:4px;
+  }
