@@ -1,12 +1,39 @@
 import { useEffect, useState } from "react";
+import bg from "../assets/booking-bg.jpeg";
+import styles from "../components/CartPage.module.css";
 
 export default function CartPage() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  async function ensureGuestToken() {
+    let token = localStorage.getItem("guestToken");
+
+    if (!token) {
+      const res = await fetch("/api/guest-session", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || "Kunne ikke oprette session");
+      }
+
+      token = data.token;
+      localStorage.setItem("guestToken", token);
+    }
+
+    return token;
+  }
 
   async function loadCart() {
     try {
-      const token = localStorage.getItem("guestToken");
+      setLoading(true);
+      setError("");
+
+      const token = await ensureGuestToken();
 
       const res = await fetch("/api/cart", {
         headers: {
@@ -23,6 +50,8 @@ export default function CartPage() {
       setItems(data.items || []);
     } catch (err) {
       setError(String(err?.message || err));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -35,22 +64,54 @@ export default function CartPage() {
   }, 0);
 
   return (
-    <div style={{ padding: "120px 24px", minHeight: "100vh" }}>
-      <h1>Kurv</h1>
+    <div
+      className={styles.page}
+      style={{ backgroundImage: `url(${bg})` }}
+    >
+      <div className={styles.inner}>
+        <h1 className={styles.title}>Kurv</h1>
+        <p className={styles.subtitle}>Dine valgte produkter</p>
 
-      {error && <p>{error}</p>}
+        {loading && <p className={styles.message}>Henter kurv...</p>}
+        {error && <p className={styles.error}>{error}</p>}
 
-      {items.length === 0 && <p>Din kurv er tom.</p>}
+        {!loading && !error && items.length === 0 && (
+          <div className={styles.empty}>
+            <h2>Din kurv er tom</h2>
+            <p>Gå tilbage til produkter og tilføj noget til kurven.</p>
+            <a href="/produkter" className={styles.linkButton}>
+              Se produkter
+            </a>
+          </div>
+        )}
 
-      {items.map((item) => (
-        <div key={item.cart_item_id}>
-          <h3>{item.product_name}</h3>
-          <p>Antal: {item.quantity}</p>
-          <p>Pris: {Number(item.product_price).toFixed(2)} kr</p>
-        </div>
-      ))}
+        {items.length > 0 && (
+          <>
+            <div className={styles.list}>
+              {items.map((item) => (
+                <article className={styles.itemCard} key={item.cart_item_id}>
+                  <div>
+                    <h3>{item.product_name}</h3>
+                    <p>Antal: {item.quantity}</p>
+                  </div>
 
-      <h2>Total: {total.toFixed(2)} kr</h2>
+                  <div className={styles.meta}>
+                    <span>{Number(item.product_price).toFixed(2)} kr</span>
+                    <strong>
+                      {(Number(item.product_price) * Number(item.quantity)).toFixed(2)} kr
+                    </strong>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <section className={styles.totalBox}>
+              <span>Total</span>
+              <strong>{total.toFixed(2)} kr</strong>
+            </section>
+          </>
+        )}
+      </div>
     </div>
   );
 }
