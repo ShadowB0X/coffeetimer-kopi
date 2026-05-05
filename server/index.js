@@ -290,6 +290,49 @@ app.get("/api/cart", async (req, res) => {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
+
+app.delete("/api/cart/items/:cartItemId", async (req, res) => {
+  try {
+    const token = req.headers["x-guest-token"];
+    const { cartItemId } = req.params;
+
+    if (!token) {
+      return res.status(401).json({ ok: false, error: "Missing token" });
+    }
+
+    const result = await db.query(
+      `
+      DELETE FROM cart_items ci
+      USING carts c, guest_sessions gs
+      WHERE ci.cart_id = c.cart_id
+        AND c.session_id = gs.session_id
+        AND gs.token = $1
+        AND ci.cart_item_id = $2
+      RETURNING ci.*
+      `,
+      [token, cartItemId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Produktet blev ikke fundet i kurven",
+      });
+    }
+
+    res.json({
+      ok: true,
+      deletedItem: result.rows[0],
+    });
+  } catch (err) {
+    res.status(500).json({
+      ok: false,
+      error: String(err?.message || err),
+    });
+  }
+});
+
+
 app.post("/api/guest-session", async (req, res) => {
   try {
     const token = crypto.randomUUID();

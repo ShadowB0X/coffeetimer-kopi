@@ -55,6 +55,31 @@ export default function CartPage() {
     }
   }
 
+  async function removeFromCart(cartItemId) {
+    try {
+      setError("");
+
+      const token = localStorage.getItem("guestToken");
+
+      const res = await fetch(`/api/cart/items/${cartItemId}`, {
+        method: "DELETE",
+        headers: {
+          "x-guest-token": token,
+        },
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || "Kunne ikke fjerne produktet");
+      }
+
+      await loadCart();
+    } catch (err) {
+      setError(String(err?.message || err));
+    }
+  }
+
   useEffect(() => {
     loadCart();
   }, []);
@@ -100,6 +125,14 @@ export default function CartPage() {
                     <strong>
                       {(Number(item.product_price) * Number(item.quantity)).toFixed(2)} kr
                     </strong>
+
+                    {/* 🔥 FJERN KNAP */}
+                    <button
+                      className={styles.removeButton}
+                      onClick={() => removeFromCart(item.cart_item_id)}
+                    >
+                      Fjern
+                    </button>
                   </div>
                 </article>
               ))}
