@@ -290,6 +290,28 @@ app.get("/api/cart", async (req, res) => {
     res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 });
+app.post("/api/guest-session", async (req, res) => {
+  try {
+    const token = crypto.randomUUID();
+
+    const result = await db.query(
+      `
+      INSERT INTO guest_sessions (token)
+      VALUES ($1)
+      RETURNING *
+      `,
+      [token]
+    );
+
+    res.json({
+      ok: true,
+      token: result.rows[0].token,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 
 app.get("/api/barbers", (req, res) => {
   res.json({ ok: true, barbers: BARBERS });

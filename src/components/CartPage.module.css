@@ -1,0 +1,146 @@
+.page{
+    min-height:100vh;
+    color:#f5f5f3;
+    font-family:ui-serif, Georgia, "Times New Roman", Times, serif;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    position:relative;
+  }
+  
+  .page::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.75), rgba(0,0,0,.4), rgba(0,0,0,.75)),
+      radial-gradient(circle at center, rgba(0,0,0,.2), rgba(0,0,0,.85));
+    pointer-events:none;
+    z-index:0;
+  }
+  
+  .inner{
+    position:relative;
+    z-index:1;
+    max-width:900px;
+    margin:0 auto;
+    padding:120px 18px 70px;
+  }
+  
+  .title{
+    text-align:center;
+    font-size:clamp(2.2rem,4vw,3rem);
+    margin:0 0 8px;
+    color:#fff;
+  }
+  
+  .subtitle{
+    text-align:center;
+    opacity:.75;
+    margin-bottom:34px;
+  }
+  
+  .message,
+  .error{
+    text-align:center;
+  }
+  
+  .error{
+    color:#ff8f8f;
+  }
+  
+  .list{
+    display:grid;
+    gap:14px;
+  }
+  
+  .itemCard,
+  .empty,
+  .totalBox{
+    background:rgba(20,20,20,.58);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 20px 50px rgba(0,0,0,.55);
+  }
+  
+  .itemCard{
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+  }
+  
+  .itemCard h3{
+    margin:0 0 8px;
+  }
+  
+  .itemCard p{
+    margin:0;
+    opacity:.7;
+  }
+  
+  .meta{
+    display:grid;
+    gap:6px;
+    text-align:right;
+  }
+  
+  .meta span{
+    opacity:.75;
+  }
+  
+  .meta strong{
+    color:#00c896;
+  }
+  
+  .totalBox{
+    margin-top:18px;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:1.25rem;
+  }
+  
+  .totalBox strong{
+    color:#00c896;
+  }
+  
+  .empty{
+    text-align:center;
+    padding:34px 20px;
+  }
+  
+  .empty h2{
+    margin:0 0 8px;
+  }
+  
+  .empty p{
+    opacity:.75;
+  }
+  
+  .linkButton{
+    display:inline-flex;
+    margin-top:16px;
+    padding:10px 18px;
+    border-radius:999px;
+    background:#00c896;
+    color:#02110d;
+    text-decoration:none;
+    font-weight:700;
+  }
+  
+  @media(max-width:620px){
+    .itemCard{
+      flex-direction:column;
+    }
+  
+    .meta{
+      text-align:left;
+    }
+  
+    .totalBox{
+      font-size:1.05rem;
+    }
+  }
