@@ -12,6 +12,7 @@ export default function Navbar() {
           <Link to="/prices" className={styles.link}>Priser</Link>
           <Link to="/kontakt" className={styles.link}>Kontakt</Link>
           <Link to="/booking" className={styles.bookBtn}>Book Tid</Link>
+          <Link to="/kurv" className={styles.cartLink}> 🛒 Kurv</Link>
         </div>
       </div>
     </nav>
