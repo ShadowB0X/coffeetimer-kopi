@@ -1,0 +1,104 @@
+### Variabler
+@baseUrl = http://shadowbox.dk
+@adminToken = coffeetimer-admin-token
+@guestToken = "76caf4fc-fb59-47d9-a16b-ee8c07b7698f"
+
+############################################################
+# 1. AUTH & LOGIN (Fra LoginPage.jsx)
+############################################################
+
+
+### Log ind som admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@coffeetimer.local",
+  "password": "admin123"
+}
+
+
+############################################################
+# 2. PRODUKTER (Fra ProductsPage.jsx & ProductPage.jsx)
+############################################################
+
+### Hent alle produkter (Kunde-view)
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+###
+
+### Opret nyt produkt (Admin-only)
+# Feltnavne matcher dbv2.png: product_name, product_price, stock_quantity
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "product_name": "Premium Matte Clay",
+  "product_price": 149,
+  "stock_quantity": 25
+}
+
+###
+
+### Slet et produkt (Brug et rigtigt UUID fra GET kaldet)
+DELETE {{baseUrl}}/api/products/68ed2872-6e05-4ebc-9a85-9e8c1f9967f7
+Authorization: Bearer {{adminToken}}
+
+############################################################
+# 3. BOOKING (Fra BookingPage.jsx & dbv2.png)
+############################################################
+
+### Opret en tidsbestilling
+# Kræver eksisterende UUID'er for customer, barber og service i 3NF
+POST {{baseUrl}}/api/bookings
+Content-Type: application/json
+
+{
+   "barberId": "zana",
+
+  "serviceId": "hair",
+
+  "startISO": "2026-07-01T10:00:00Z",
+
+  "customerName": "Test Kunde",
+
+  "customerPhone": "12345678"
+}
+
+###
+
+### Hent alle bookinger (Admin-oversigt)
+GET {{baseUrl}}/api/bookings
+Authorization: Bearer {{adminToken}}
+
+############################################################
+# 4. INDKØBSKURV (Fra CartPage.jsx & dbv2.png)
+############################################################
+
+### Hent gæstekurv ## (husk indsæt guest-token fra nuværende session"
+@guestToken = 76caf4fc-fb59-47d9-a16b-ee8c07b7698f
+GET {{baseUrl}}/api/cart
+Accept: application/json
+x-guest-token: {{guestToken}}
+
+###
+
+### Tilføj produkt til kurv
+
+POST {{baseUrl}}/api/cart/items
+Content-Type: application/json
+x-guest-token: {{guestToken}}
+
+{
+  "productId": "a6030fa1-34c7-4190-ab93-a1b4fd1b9faa",
+  "quantity": 1
+}
+
+###
+
+### Fjern emne fra kurv (Brug cart_item_id)
+### Fjern produkt fra kurv
+DELETE {{baseUrl}}/api/cart/items/2f9655eb-3ca6-4791-9eb7-c187fd9b7727
+x-guest-token: {{guestToken}}
