@@ -487,38 +487,43 @@ app.post("/api/bookings", async (req, res) => {
       });
     }
 
+    const customerId = crypto.randomUUID();
     const bookingId = crypto.randomUUID();
+
     const cleanCustomerName = customerName.trim();
     const cleanCustomerPhone = customerPhone?.trim() || "";
+
+    await db.query(
+      `
+      INSERT INTO customers (
+        customer_id,
+        customer_name,
+        customer_phone
+      )
+      VALUES ($1, $2, $3)
+      `,
+      [customerId, cleanCustomerName, cleanCustomerPhone]
+    );
 
     const insertResult = await db.query(
       `
       INSERT INTO bookings (
         booking_id,
+        customer_id,
         barber_id,
-        barber_name,
         service_id,
-        service_name,
-        service_price,
-        service_duration_min,
-        customer_name,
-        customer_phone,
         start_time,
-        end_time
+        end_time,
+        booking_status
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+      VALUES ($1, $2, $3, $4, $5, $6, 'active')
       RETURNING *
       `,
       [
         bookingId,
+        customerId,
         barber.id,
-        barber.name,
         service.id,
-        service.name,
-        service.price,
-        service.durationMin,
-        cleanCustomerName,
-        cleanCustomerPhone,
         startTime,
         endTime,
       ]
