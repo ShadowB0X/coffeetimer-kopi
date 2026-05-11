@@ -1,6 +1,6 @@
 const request = require("supertest");
 
-const baseUrl = "http://shadowbox.dk";
+const baseUrl = "https://shadowbox.dk";
 
 describe("ShortCut API integration tests", () => {
   test("GET /api/products should return products", async () => {
