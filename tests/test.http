@@ -114,3 +114,16 @@ Content-Type: application/json
   "customerName": "Test Kunde",
   "customerPhone": "12345678"
 }
+
+@baseUrl = https://shadowbox.dk
+@guestToken = 76caf4fc-fb59-47d9-a16b-ee8c07b7698f
+
+### Send afhentningsordre
+POST {{baseUrl}}/api/orders/pickup
+Content-Type: application/json
+x-guest-token: {{guestToken}}
+
+{
+  "customerName": "Test Kunde",
+  "customerPhone": "12345678"
+}

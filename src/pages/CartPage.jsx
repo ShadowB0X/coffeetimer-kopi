@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import bg from "../assets/booking-bg.jpeg";
 import styles from "../components/CartPage.module.css";
 
@@ -6,6 +7,12 @@ export default function CartPage() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [ordering, setOrdering] = useState(false);
+
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+
+  const navigate = useNavigate();
 
   async function ensureGuestToken() {
     let token = localStorage.getItem("guestToken");
@@ -80,6 +87,48 @@ export default function CartPage() {
     }
   }
 
+  async function submitPickupOrder(e) {
+    e.preventDefault();
+    setError("");
+
+    if (!customerName.trim() || !customerPhone.trim()) {
+      setError("Skriv navn og telefonnummer.");
+      return;
+    }
+
+    try {
+      setOrdering(true);
+
+      const token = await ensureGuestToken();
+
+      const res = await fetch("/api/orders/pickup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-guest-token": token,
+        },
+        body: JSON.stringify({
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || "Kunne ikke oprette afhentningsordre");
+      }
+
+      sessionStorage.setItem("lastPickupOrder", JSON.stringify(data.order));
+
+      navigate("/kvittering");
+    } catch (err) {
+      setError(String(err?.message || err));
+    } finally {
+      setOrdering(false);
+    }
+  }
+
   useEffect(() => {
     loadCart();
   }, []);
@@ -126,7 +175,6 @@ export default function CartPage() {
                       {(Number(item.product_price) * Number(item.quantity)).toFixed(2)} kr
                     </strong>
 
-                    {/* 🔥 FJERN KNAP */}
                     <button
                       className={styles.removeButton}
                       onClick={() => removeFromCart(item.cart_item_id)}
@@ -142,6 +190,39 @@ export default function CartPage() {
               <span>Total</span>
               <strong>{total.toFixed(2)} kr</strong>
             </section>
+
+            <form className={styles.orderForm} onSubmit={submitPickupOrder}>
+              <h2>Bestil til afhentning</h2>
+              <p>Udfyld dine oplysninger, så reserverer vi varerne til afhentning i butikken.</p>
+
+              <label>
+                <span>Navn</span>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Dit navn"
+                />
+              </label>
+
+              <label>
+                <span>Telefon</span>
+                <input
+                  type="tel"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="12 34 56 78"
+                />
+              </label>
+
+              <button
+                className={styles.orderButton}
+                type="submit"
+                disabled={ordering}
+              >
+                {ordering ? "Sender ordre..." : "Bestil til afhentning"}
+              </button>
+            </form>
           </>
         )}
       </div>
