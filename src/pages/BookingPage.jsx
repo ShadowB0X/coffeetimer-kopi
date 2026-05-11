@@ -38,7 +38,7 @@ export default function BookingPage() {
   const [slots, setSlots] = useState([]);
 
   const [barberId, setBarberId] = useState("");
-  const [serviceId, setServiceId] = useState("");
+  const [serviceIds, setServiceIds] = useState([]);
   const [date, setDate] = useState(todayISODate());
   const [slot, setSlot] = useState("");
 
@@ -59,7 +59,26 @@ export default function BookingPage() {
   }, []);
 
   const selectedBarber = barbers.find((b) => b.id === barberId);
-  const selectedService = services.find((s) => s.id === serviceId);
+
+  const selectedServices = services.filter((s) => serviceIds.includes(s.id));
+
+  const totalPrice = selectedServices.reduce((sum, s) => {
+    return sum + Number(s.price || 0);
+  }, 0);
+
+  const totalDuration = selectedServices.reduce((sum, s) => {
+    return sum + Number(s.durationMin || 0);
+  }, 0);
+
+  function toggleService(serviceId) {
+    setServiceIds((prev) => {
+      if (prev.includes(serviceId)) {
+        return prev.filter((id) => id !== serviceId);
+      }
+
+      return [...prev, serviceId];
+    });
+  }
 
   useEffect(() => {
     (async () => {
@@ -82,7 +101,10 @@ export default function BookingPage() {
         setServices(s.services || []);
 
         if ((b.barbers || []).length > 0) setBarberId(b.barbers[0].id);
-        if ((s.services || []).length > 0) setServiceId(s.services[0].id);
+
+        if ((s.services || []).length > 0) {
+          setServiceIds([s.services[0].id]);
+        }
       } catch (e) {
         setErr(String(e?.message || e));
       } finally {
@@ -123,8 +145,8 @@ export default function BookingPage() {
     setMsg("");
     setErr("");
 
-    if (!barberId || !serviceId || !slot || !name.trim()) {
-      setErr("Vælg frisør, service, tid og skriv navn.");
+    if (!barberId || serviceIds.length === 0 || !slot || !name.trim()) {
+      setErr("Vælg frisør, mindst én service, tid og skriv navn.");
       return;
     }
 
@@ -134,7 +156,7 @@ export default function BookingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           barberId,
-          serviceId,
+          serviceIds,
           startISO: slot,
           customerName: name.trim(),
           customerPhone: phone.trim(),
@@ -166,9 +188,9 @@ export default function BookingPage() {
 
   return (
     <div
-  className={styles.page}
-  style={{ backgroundImage: `url(${bookingBg})` }}
->
+      className={styles.page}
+      style={{ backgroundImage: `url(${bookingBg})` }}
+    >
       <section className={styles.phoneShell}>
         <header className={styles.topBar}>
           <span className={styles.backCircle}>‹</span>
@@ -216,8 +238,8 @@ export default function BookingPage() {
                 <button
                   key={s.id}
                   type="button"
-                  className={`${styles.serviceBtn} ${serviceId === s.id ? styles.active : ""}`}
-                  onClick={() => setServiceId(s.id)}
+                  className={`${styles.serviceBtn} ${serviceIds.includes(s.id) ? styles.active : ""}`}
+                  onClick={() => toggleService(s.id)}
                   disabled={loading}
                 >
                   <span>{s.name}</span>
@@ -225,6 +247,12 @@ export default function BookingPage() {
                 </button>
               ))}
             </div>
+
+            {selectedServices.length > 0 && (
+              <p className={styles.muted} style={{ marginTop: "12px" }}>
+                Samlet: {totalPrice} kr · {totalDuration} min
+              </p>
+            )}
           </section>
 
           <section className={styles.sectionBlock}>
@@ -311,9 +339,8 @@ export default function BookingPage() {
           <button className={styles.confirmBar} type="submit">
             <span>›</span>
             <strong>
-              {selectedService
-                ? `Book ${selectedService.name} · ${selectedService.price} kr`
-                : "Book tid"}
+              Book {selectedServices.length > 0 ? selectedServices.length : ""} service
+              {selectedServices.length > 1 ? "s" : ""} · {totalPrice} kr
             </strong>
             <em>{slot ? formatTime(slot) : "Vælg tid"}</em>
           </button>

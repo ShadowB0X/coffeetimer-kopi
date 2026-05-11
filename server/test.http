@@ -102,3 +102,15 @@ x-guest-token: {{guestToken}}
 ### Fjern produkt fra kurv
 DELETE {{baseUrl}}/api/cart/items/2f9655eb-3ca6-4791-9eb7-c187fd9b7727
 x-guest-token: {{guestToken}}
+
+### Test booking med hår + skæg
+POST {{baseUrl}}/api/bookings
+Content-Type: application/json
+
+{
+  "barberId": "zana",
+  "serviceIds": ["hair", "beard"],
+  "startISO": "2026-09-01T13:00:00Z",
+  "customerName": "Test Kunde",
+  "customerPhone": "12345678"
+}
