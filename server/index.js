@@ -414,73 +414,70 @@ app.get("/api/availability", async (req, res) => {
   }
 });
 
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const result = await db.query(
-      `
-      SELECT
-        booking_id,
-        barber_id,
-        barber_name,
-        service_id,
-        service_name,
-        service_price,
-        service_duration_min,
-        customer_name,
-        customer_phone,
-        start_time,
-        end_time,
-        booking_status,
-        created_at
-      FROM bookings
-      ORDER BY start_time DESC
-      `
-    );
-
-    res.json({ ok: true, bookings: result.rows });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});
-
 app.post("/api/bookings", async (req, res) => {
   try {
-    const { barberId, serviceId, startISO, customerName, customerPhone } = req.body || {};
+    const {
+      barberId,
+      serviceId,
+      serviceIds,
+      startISO,
+      customerName,
+      customerPhone,
+    } = req.body || {};
 
-    if (!barberId || !serviceId || !startISO || !customerName) {
+    const selectedServiceIds = Array.isArray(serviceIds)
+      ? serviceIds
+      : serviceId
+        ? [serviceId]
+        : [];
+
+    if (!barberId || selectedServiceIds.length === 0 || !startISO || !customerName) {
       return res.status(400).json({
         ok: false,
-        error: "Missing fields: barberId, serviceId, startISO, customerName",
+        error: "Missing fields: barberId, serviceIds, startISO, customerName",
       });
     }
 
     if (!isIsoDateTime(startISO)) {
       return res.status(400).json({
         ok: false,
-        error: "startISO must be a valid ISO datetime string",
+        error: "Invalid date",
       });
     }
 
-    const barber = findBarber(barberId);
-    const service = findService(serviceId);
+    const barber = BARBERS.find((b) => b.id === barberId);
 
-    if (!barber || !service) {
+    const selectedServices = selectedServiceIds
+      .map((id) => SERVICES.find((s) => s.id === id))
+      .filter(Boolean);
+
+    if (!barber || selectedServices.length !== selectedServiceIds.length) {
       return res.status(400).json({
         ok: false,
-        error: "Invalid barberId or serviceId",
+        error: "Invalid barberId or serviceIds",
       });
     }
 
-    const startTime = new Date(startISO);
-    const endTime = new Date(startTime.getTime() + service.durationMin * 60_000);
+    const totalPrice = selectedServices.reduce((sum, s) => sum + Number(s.price), 0);
+    const totalDurationMin = selectedServices.reduce((sum, s) => sum + Number(s.durationMin), 0);
 
-    const conflict = await findConflictingBooking({
-      barberId,
-      startTime,
-      endTime,
-    });
+    const start = new Date(startISO);
+    const end = new Date(start.getTime() + totalDurationMin * 60000);
 
-    if (conflict) {
+    const conflict = await db.query(
+      `
+      SELECT 1
+      FROM bookings
+      WHERE barber_id = $1
+        AND booking_status = 'active'
+        AND start_time < $3
+        AND end_time > $2
+      LIMIT 1
+      `,
+      [barberId, start, end]
+    );
+
+    if (conflict.rows.length > 0) {
       return res.status(409).json({
         ok: false,
         error: "Tiden er allerede booket",
@@ -490,8 +487,8 @@ app.post("/api/bookings", async (req, res) => {
     const customerId = crypto.randomUUID();
     const bookingId = crypto.randomUUID();
 
-    const cleanCustomerName = customerName.trim();
-    const cleanCustomerPhone = customerPhone?.trim() || "";
+    const cleanCustomerName = String(customerName || "").trim();
+    const cleanCustomerPhone = String(customerPhone || "").trim();
 
     await db.query(
       `
@@ -504,6 +501,8 @@ app.post("/api/bookings", async (req, res) => {
       `,
       [customerId, cleanCustomerName, cleanCustomerPhone]
     );
+
+    const primaryService = selectedServices[0];
 
     const insertResult = await db.query(
       `
@@ -523,52 +522,66 @@ app.post("/api/bookings", async (req, res) => {
         bookingId,
         customerId,
         barber.id,
-        service.id,
-        startTime,
-        endTime,
+        primaryService.id,
+        start,
+        end,
       ]
     );
 
+    for (const service of selectedServices) {
+      await db.query(
+        `
+        INSERT INTO booking_services (
+          booking_service_id,
+          booking_id,
+          service_id,
+          service_name,
+          service_price,
+          service_duration_min
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [
+          crypto.randomUUID(),
+          bookingId,
+          service.id,
+          service.name,
+          service.price,
+          service.durationMin,
+        ]
+      );
+    }
+
     const savedBooking = insertResult.rows[0];
+
+    const serviceLines = selectedServices
+      .map((s) => `- ${s.name} (${s.price} kr / ${s.durationMin} min)`)
+      .join("\n");
 
     const msg =
       `📅 *Ny booking!*\n` +
       `👤 *Kunde:* ${cleanCustomerName}${cleanCustomerPhone ? ` (${cleanCustomerPhone})` : ""}\n` +
       `💈 *Frisør:* ${barber.name}\n` +
-      `✂️ *Service:* ${service.name} (${service.price} kr)\n` +
-      `⏱️ *Varighed:* ${service.durationMin} min\n` +
-      `🕒 *Tid:* ${startTime.toLocaleString("da-DK")}\n` +
+      `✂️ *Services:*\n${serviceLines}\n` +
+      `💰 *Samlet pris:* ${totalPrice} kr\n` +
+      `⏱️ *Samlet varighed:* ${totalDurationMin} min\n` +
+      `🕒 *Tid:* ${start.toLocaleString("da-DK")}\n` +
       `📍 *Adresse:* Gammel Kongevej 91C`;
 
     await sendTelegramMessage(msg);
 
-    res.json({ ok: true, booking: savedBooking });
+    res.json({
+      ok: true,
+      booking: savedBooking,
+      services: selectedServices,
+      totalPrice,
+      totalDurationMin,
+    });
   } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
-  }
-});
-
-app.patch("/api/bookings/:bookingId/cancel", async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-
-    const result = await db.query(
-      `
-      UPDATE bookings
-      SET booking_status = 'cancelled'
-      WHERE booking_id = $1
-      RETURNING *
-      `,
-      [bookingId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: "Booking not found" });
-    }
-
-    res.json({ ok: true, booking: result.rows[0] });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err?.message || err) });
+    res.status(500).json({
+      ok: false,
+      error: String(err?.message || err),
+    });
   }
 });
 
