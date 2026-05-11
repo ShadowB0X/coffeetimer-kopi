@@ -9,7 +9,6 @@ import VisionPage from './pages/VisionPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import Navbar from './pages/Navbar.jsx';
-import IntroPage from './pages/IntroPage';
 import ProductsPage from './pages/ProductsPage.jsx';
 
 function App() {
@@ -54,10 +53,9 @@ function App() {
         <Route path="/produkter" element={<ProductsPage />} />
         <Route path="/prices" element={<PricesPage />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/intro" element={<IntroPage />} />
         <Route path="/kontakt" element={<VisionPage />} />
         <Route path="/kurv" element={<CartPage />} />
-        
+
         {/* Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/auth/login" element={<LoginPage onLogin={handleLogin} />} />
