@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import ReceiptPage from './pages/ReceiptPage.jsx';
 import CartPage from './pages/CartPage.jsx';
 import PricesPage from './pages/PricesPage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
@@ -55,7 +56,8 @@ function App() {
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/kontakt" element={<VisionPage />} />
         <Route path="/kurv" element={<CartPage />} />
-
+        <Route path="/kvittering" element={<ReceiptPage />} />
+        
         {/* Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/auth/login" element={<LoginPage onLogin={handleLogin} />} />
