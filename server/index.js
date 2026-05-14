@@ -355,13 +355,41 @@ app.post("/api/guest-session", async (req, res) => {
   }
 });
 
+app.get("/api/barbers", async (req, res) => {
+  try {
+    const result = await db.query(
+      `
+      SELECT
+        barber_id AS id,
+        barber_name AS name
+      FROM barbers
+      ORDER BY barber_name ASC
+      `
+    );
 
-app.get("/api/barbers", (req, res) => {
-  res.json({ ok: true, barbers: BARBERS });
+    res.json({ ok: true, barbers: result.rows });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
 });
+app.get("/api/services", async (req, res) => {
+  try {
+    const result = await db.query(
+      `
+      SELECT
+        service_id AS id,
+        service_name AS name,
+        service_price AS price,
+        service_duration_min AS "durationMin"
+      FROM services
+      ORDER BY service_name ASC
+      `
+    );
 
-app.get("/api/services", (req, res) => {
-  res.json({ ok: true, services: SERVICES });
+    res.json({ ok: true, services: result.rows });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err?.message || err) });
+  }
 });
 
 app.get("/api/availability", async (req, res) => {
@@ -445,21 +473,55 @@ app.post("/api/bookings", async (req, res) => {
       });
     }
 
-    const barber = BARBERS.find((b) => b.id === barberId);
+    const barberResult = await db.query(
+      `
+      SELECT
+        barber_id AS id,
+        barber_name AS name
+      FROM barbers
+      WHERE barber_id = $1
+      `,
+      [barberId]
+    );
 
-    const selectedServices = selectedServiceIds
-      .map((id) => SERVICES.find((s) => s.id === id))
-      .filter(Boolean);
-
-    if (!barber || selectedServices.length !== selectedServiceIds.length) {
+    if (barberResult.rows.length === 0) {
       return res.status(400).json({
         ok: false,
-        error: "Invalid barberId or serviceIds",
+        error: "Invalid barberId",
       });
     }
 
-    const totalPrice = selectedServices.reduce((sum, s) => sum + Number(s.price), 0);
-    const totalDurationMin = selectedServices.reduce((sum, s) => sum + Number(s.durationMin), 0);
+    const barber = barberResult.rows[0];
+
+    const servicesResult = await db.query(
+      `
+      SELECT
+        service_id AS id,
+        service_name AS name,
+        service_price AS price,
+        service_duration_min AS "durationMin"
+      FROM services
+      WHERE service_id = ANY($1)
+      `,
+      [selectedServiceIds]
+    );
+
+    const selectedServices = servicesResult.rows;
+
+    if (selectedServices.length !== selectedServiceIds.length) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid serviceIds",
+      });
+    }
+
+    const totalPrice = selectedServices.reduce((sum, s) => {
+      return sum + Number(s.price);
+    }, 0);
+
+    const totalDurationMin = selectedServices.reduce((sum, s) => {
+      return sum + Number(s.durationMin);
+    }, 0);
 
     const start = new Date(startISO);
     const end = new Date(start.getTime() + totalDurationMin * 60000);
@@ -502,27 +564,23 @@ app.post("/api/bookings", async (req, res) => {
       [customerId, cleanCustomerName, cleanCustomerPhone]
     );
 
-    const primaryService = selectedServices[0];
-
     const insertResult = await db.query(
       `
       INSERT INTO bookings (
         booking_id,
         customer_id,
         barber_id,
-        service_id,
         start_time,
         end_time,
         booking_status
       )
-      VALUES ($1, $2, $3, $4, $5, $6, 'active')
+      VALUES ($1, $2, $3, $4, $5, 'active')
       RETURNING *
       `,
       [
         bookingId,
         customerId,
         barber.id,
-        primaryService.id,
         start,
         end,
       ]
@@ -534,28 +592,20 @@ app.post("/api/bookings", async (req, res) => {
         INSERT INTO booking_services (
           booking_service_id,
           booking_id,
-          service_id,
-          service_name,
-          service_price,
-          service_duration_min
+          service_id
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3)
         `,
         [
           crypto.randomUUID(),
           bookingId,
           service.id,
-          service.name,
-          service.price,
-          service.durationMin,
         ]
       );
     }
 
-    const savedBooking = insertResult.rows[0];
-
     const serviceLines = selectedServices
-      .map((s) => `- ${s.name} (${s.price} kr / ${s.durationMin} min)`)
+      .map((s) => `- ${s.name} (${Number(s.price)} kr / ${Number(s.durationMin)} min)`)
       .join("\n");
 
     const msg =
@@ -572,7 +622,7 @@ app.post("/api/bookings", async (req, res) => {
 
     res.json({
       ok: true,
-      booking: savedBooking,
+      booking: insertResult.rows[0],
       services: selectedServices,
       totalPrice,
       totalDurationMin,
