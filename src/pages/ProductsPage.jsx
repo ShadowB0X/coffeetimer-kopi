@@ -122,7 +122,7 @@ export default function ProductsPage() {
           {products.map((product) => {
             const name = product.name || product.product_name;
             const price = product.price ?? product.product_price;
-            const quantity = product.stock_quantity;
+            const quantity = product.available_stock ?? product.stock_quantity;
 
             return (
               <div className={styles.card} key={product.product_id}>
